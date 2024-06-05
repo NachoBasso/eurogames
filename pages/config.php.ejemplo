@@ -1,0 +1,10 @@
+<?php
+const BBDD_USER = 'xxxxxxxxxxxxx';
+const BBDD_HOST='localhost';
+const BBDD_NAME="eurogames";
+const BBDD_PASSWORD ='xxxxxxxxxx';
+
+const CLIENT_ID = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com";
+const CLIENT_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+const REDIRECT_URI = 'http://localhost/eurogames/pages/login.php';
+const RECAPTCHA_SECRET_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
