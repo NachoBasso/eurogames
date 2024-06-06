@@ -351,27 +351,6 @@ class Juego
         }
     }
 
-    /*public function devolverFotoJuego($id_juego)
-    {
-        try {
-            $query = "SELECT foto FROM juego WHERE id_juego = :id_juego";
-            $stmt = $this->conexion->getConBD()->prepare($query);
-            $stmt->bindValue(':id_juego', $id_juego);
-            $stmt->execute();
-            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($resultado) {
-                return $resultado['foto'];
-            } else {
-                return null;
-            }
-        } catch (PDOException $e) {
-            die("¡Error al obtener la foto del juego!: " . $e->getMessage() . "<br/>");
-        }
-    }*/
-
-
-
     public function obtenerCategorias()
     {
         try {

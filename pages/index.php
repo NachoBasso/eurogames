@@ -55,7 +55,7 @@ if (isset($_POST['agregar_al_carrito'])) {
               <div class="carousel-caption">
                 <h5 class="text-shadow">A TIRAR LOS DADOS</h5>
                 <p class="fw-bolder mt-2">¡Un poco de azar para dar vueltas las cosas!</p>
-                <a href="listadoJuegos.php" class="btn boton-magico roboto-mono mt-3 mb-3">VER JUEGOS</a>
+                <a href="listadoJuegos.php?categoria=dados" class="btn boton-magico roboto-mono mt-3 mb-3">VER JUEGOS</a>
               </div>
             </div>
             <div class="carousel-item">
@@ -63,7 +63,7 @@ if (isset($_POST['agregar_al_carrito'])) {
               <div class="carousel-caption">
                 <h5 class="text-shadow">DIVERSIÓN EN EL TABLERO</h5>
                 <p class="fw-bolder mt-2">¿Tienes alma de explorador?...¡Estos juegos son para tí!</p>
-                <a href="listadoJuegos.php" class="btn boton-magico roboto-mono mt-3 mb-3">VER JUEGOS</a>
+                <a href="listadoJuegos.php?categoria=tablero" class="btn boton-magico roboto-mono mt-3 mb-3">VER JUEGOS</a>
               </div>
             </div>
             <div class="carousel-item">
@@ -71,7 +71,7 @@ if (isset($_POST['agregar_al_carrito'])) {
               <div class="carousel-caption">
                 <h5 class="text-shadow">JUEGA CON CARTAS O LOSETAS</h5>
                 <p class="fw-bolder mt-2">¿Prefieres administrar recursos?... ¡Arma tu estrategia!</p>
-                <a href="listadoJuegos.php" class="btn boton-magico roboto-mono mt-3 mb-3">VER JUEGOS</a>
+                <a href="listadoJuegos.php?categoria=carta" class="btn boton-magico roboto-mono mt-3 mb-3">VER JUEGOS</a>
               </div>
             </div>
           </div>
