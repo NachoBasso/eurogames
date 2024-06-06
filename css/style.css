@@ -559,11 +559,25 @@ footer .nav-item {
     font-size:3rem;
     color: black;
 }
+.text-shadow-orange{
+    text-shadow: 2px  2px #1d4c66;
+    font-weight:bolder;
+    font-size:3rem;
+    color: black;
+}
+
+.text-shadow-orange:hover {
+    transition: transform 0.5s ease; 
+    transform: translate(-5px, 5px);
+    text-shadow: 5px 5px #FFAA50;
+}
+
 .text-shadow-bold{
     text-shadow: 2px  2px #1d4c66;
     font-weight:bolder;
     color: black;
 }
+
 .box-shadow-orange{
     box-shadow: 5px  5px 10px  #1e1d1d;    
 }

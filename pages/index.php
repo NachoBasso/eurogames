@@ -181,7 +181,7 @@ if (isset($_POST['agregar_al_carrito'])) {
 
     <div class="row">
       <div class="col-md-6 mt-5 mb-5">
-        <h2 class="text-center text-black text-shadow-blue mb-5">OFERTAS </h2>
+        <a href="listadoJuegos.php?categoria=oferta" class="text-decoration-none"> <h2 class="text-center text-black text-shadow-orange mb-5">OFERTAS </h2></a>
         <div id="carouselOferta" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
             <?php foreach ($juegosOferta as $index => $images) : ?>
@@ -208,7 +208,7 @@ if (isset($_POST['agregar_al_carrito'])) {
         </div>
       </div>
       <div class="col-md-6 mt-5 mb-5">
-        <h2 class="text-center text-black text-shadow-blue mb-5">NOVEDADES</h2>
+      <a href="listadoJuegos.php?categoria=novedad" class="text-decoration-none"> <h2 class="text-center text-black text-shadow-orange mb-5">NOVEDADES</h2></a>
         <div id="carouselNovedades" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
             <?php foreach ($juegosNovedades as $index => $image) : ?>
