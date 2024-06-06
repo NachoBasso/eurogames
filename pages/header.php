@@ -23,10 +23,10 @@ $esAdministrador = isset($_SESSION['es_administrador']) ? limpiarDatos($_SESSION
                         <a class="nav-link active" aria-current="page" href="./listadoJuegos.php">Juegos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="novedades.php">Novedades</a>
+                        <a class="nav-link" href="listadoJuegos.php?categoria=novedad">Novedades</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ofertas.php">Ofertas</a>
+                        <a class="nav-link" href="listadoJuegos.php?categoria=oferta">Ofertas</a>
                     </li>
                 </ul>
                 <form class="d-flex flex-column flex-lg-row align-items-center justify-content-center justify-content-lg-start me-lg-5 ms-lg-0"
