@@ -395,11 +395,11 @@ h2, h4 {
     height: 150%;
 }
 
-.badge{
+.badge-precio{
     position: absolute;
     top: 18%;
     right: -27%;
-    transform: translate(-140%, -50%);
+    transform: translate(-212%, -50%);
     font-size:30px;
     border-radius: 3%;
     z-index: 2;
@@ -867,10 +867,10 @@ https://www.youtube.com/source/QR8CVkmJhLU/shorts?bp=8gVCCjYSJwoLUVI4Q1ZrbUpoTFU
     }    
 
 
-    .badge {
-        top: 7%; 
+    .badge-precio {
+        top: 6%; 
         right: -20%; 
-        transform: translate(-115%, -50%);
+        transform: translate(-180%, -50%);
         font-size: 1em; 
     }
 
