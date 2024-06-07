@@ -196,7 +196,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="form-check mt-4">
                                     <input class="form-check-input mx-2 mt-2" type="checkbox" id="terminos" name="terminos">
                                     <label class="form-check-label" for="terminos">
-                                        Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#terminosModal"><span class="login text-center fw-bolder text-shadow-black">TÉRMINOS Y CONDICIONES</span></a>
+                                        Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#terminosModal"><span class="login text-center fw-bolder text-shadow-black text-decoration-none">TÉRMINOS Y CONDICIONES</span></a>
                                     </label>
                                     <?php if (isset($errores['terminos'])) : ?>
                                         <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold" role="alert">
@@ -228,7 +228,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php include 'footer.php'; ?>
 
     <div class="modal fade" id="terminosModal" tabindex="-1" aria-labelledby="terminosModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down">
             <div class="modal-content bg-eurogames-blanco fw-bolder">
                 <div class="modal-header">
                     <h5 class="modal-title" id="terminosModalLabel">Términos y Condiciones</h5>

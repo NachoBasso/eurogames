@@ -47,7 +47,7 @@ html, body {
     margin-right: 10px;
 }
 
-.nav {
+ .nav {
     align-items: center;
     justify-content: space-between;
     display: flex;
@@ -66,11 +66,9 @@ html, body {
     margin-right:2rem;
     margin-left:2rem;
 }
-
 .nav-derecho{
     margin-left:3rem;
 }
-
 .btn-naranja-blanco {
     color: #ffffff; 
     background-color: #FFA500; 
@@ -89,6 +87,7 @@ html, body {
     background-color: #1d4c66; 
     border-color: #151514; 
     box-shadow:5px 5px #FFA500;
+
 }
 
 .btn-orange-blue {
@@ -107,6 +106,7 @@ html, body {
     background-color: #1d4c66; 
     border-color: #151514; 
     box-shadow:5px 5px #FFA500;
+
 }
 
 .btn-orange-black {
@@ -124,6 +124,7 @@ html, body {
     background-color: #1d4c66; 
     border-color: #151514; 
     box-shadow:5px 5px #FFA500;
+
 }
 
 .btn-blue-orange{
@@ -158,6 +159,19 @@ html, body {
     border-color: #FFA500; 
 }
 
+.btn-naranja-universo {
+    color: #FFA500; 
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('../img/backgroundUniverso.png');
+    border-color: #FFA500; 
+    font-weight: bolder;
+}
+
+.btn-naranja-universo:hover {
+    color:#fff; 
+    background-color: #1d4c66; 
+    border-color: #FFA500; 
+}
+
 .btn-azul{
     color: #fff;
     background-color: #1d4c66; 
@@ -170,7 +184,6 @@ html, body {
     border-color: #ffffff; 
     font-weight: bolder;
 }
-
 .fondo-universo {
     font-size: 20px;
     border-color: #DBDCDB; 
@@ -180,8 +193,12 @@ html, body {
     background-color: #DBDCDB;
 }
 
-.bg-eurogames-negro{      
+.bg-eurogames-negro{    
+    
     background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('../img/fondo3.png');
+   
+
+
 }
 
 .bg-eurogames-gris{
@@ -191,7 +208,10 @@ html, body {
 
 .bg-eurogames-blanco{
     background-image: linear-gradient(rgba(255, 255, 246, 0.9), rgba(255, 255, 252, 0.9)), url('../img/fondo2.png');
+
+    
 }
+
 
 .bg-gris{    
     background-color: rgba(241, 235, 235, 0.5);
@@ -201,6 +221,7 @@ html, body {
     text-align: center;
     color:black;
 }
+
 
 .inicio-juegos{
     font-size: 20px;
@@ -224,14 +245,13 @@ label{
     box-shadow:  10px 10px rgba(255, 165, 0, 0.8); 
     background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('../img/fondo1.png');
 }
-
 .register-left-grey{
     text-align: center;
     border-radius: 20px; 
     box-shadow:  10px 10px rgba(80, 80, 79, 0.8); 
     background: rgb(110, 112, 113) !important;
+    
 }
-
 .register-left input{
     border: none;
     border-radius: 1.5rem;
@@ -261,6 +281,7 @@ label{
 .border-orange{
     border-radius: 20px; 
     box-shadow:  10px 10px rgba(255, 165, 0, 0.8);   
+
 }
 
 .box-blue{
@@ -272,7 +293,6 @@ label{
     background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('../img/fondo1.png');
     text-align: center;
 }
-
 .register-left img{
     margin-top: 15%;
     margin-bottom: 5%;
@@ -365,13 +385,13 @@ h2, h4 {
     box-shadow: 0px 0px 10px 16px #FFA500;
     background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url('../img/fondo3.png');
 }
-/*
+
 .x {   
     padding:5%;
     box-shadow: 0px 0px 10px 16px #FFA500;
     background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url('../img/fondo3.png');
 }
-*/
+
 .same-height-button {
     display: flex;
     align-items: center;
@@ -408,7 +428,8 @@ h2, h4 {
 
 .card-body {
     flex: initial !important;
-}  
+}
+  
     
 .input-group-prepend span{
     width: 50px;
@@ -455,7 +476,6 @@ input:focus{
 .links a{
     margin-left: 4px;
 }
-
 .colorNaranja{
     color: #FFA500;
 }
@@ -559,6 +579,12 @@ footer .nav-item {
     font-size:3rem;
     color: black;
 }
+.text-shadow-bold{
+    text-shadow: 2px  2px #1d4c66;
+    font-weight:bolder;
+    color: black;
+}
+
 .text-shadow-orange{
     text-shadow: 2px  2px #1d4c66;
     font-weight:bolder;
@@ -571,11 +597,8 @@ footer .nav-item {
     transform: translate(-5px, 5px);
     text-shadow: 5px 5px #FFAA50;
 }
-
-.text-shadow-bold{
-    text-shadow: 2px  2px #1d4c66;
-    font-weight:bolder;
-    color: black;
+.invert-black {
+    filter: invert(100%);
 }
 
 .box-shadow-orange{
@@ -627,7 +650,7 @@ footer .nav-item {
 .orange-icon svg {
     fill: #1d4c66;
     stroke: #FFA500; 
-    stroke-width: 20px; 
+    stroke-width: 20px;
 }
 
 .card-login {     
@@ -645,6 +668,10 @@ footer .nav-item {
 .login2{   
     text-decoration: none; 
     color:white;  
+}
+
+.orange-header{
+    fill: #ff9d00;
 }
 
 /* Inspirado en "boton mágico" de youtube.
@@ -702,39 +729,6 @@ https://www.youtube.com/source/QR8CVkmJhLU/shorts?bp=8gVCCjYSJwoLUVI4Q1ZrbUpoTFU
         background-position: 0 0;
     }
 }
-section{ 
-    display: flex; 
-    width: 600px; 
-    height: 430px; 
-} 
-
-section img{ 
-    width: 0px; 
-    flex-grow: 1; 
-    object-fit: cover; 
-    opacity: .8; 
-    transition: .5s ease;
-}     
-
-section img:hover{
-    cursor: crosshair; 
-    width: 300px; 
-    opacity: 1; 
-    filter: contrast(120%); 
-}         
-
-.custom-area {
-    height: 300px; 
-    min-height: 200px; 
-    resize: vertical; 
-    padding: 16px; 
-    width:100%;
-    border-radius:  10px;
-}
-.orange-header{
-    fill: #ff9d00;
-}
-
 
 @media (max-width: 768px) {
     .nav {
@@ -774,86 +768,74 @@ section img:hover{
         padding-top:90px;
     }
 
-          .carousel{
-            margin-top:10%;
-          }
+    .carousel{
+        margin-top:10%;
+    }
 
-          .carousel-container{
-            margin-top:90px;
-          }
+    .carousel-container{
+        margin-top:90px;
+    }
               
-            .carousel-caption h5 {
-              font-size: 1.5rem; 
-            }
+    .carousel-caption h5 {
+        font-size: 1.5rem; 
+    }
           
-            .carousel-caption p {
-              font-size: 1rem; 
-            }
+    .carousel-caption p {
+        font-size: 1rem; 
+    }
           
-            .carousel-caption .btn {
-              font-size: 0.8rem; 
-              color: rgba(219, 220, 219, 0.5) !important;
-            }
+    .carousel-caption .btn {
+        font-size: 0.8rem; 
+        color: rgba(219, 220, 219, 0.5) !important;
+    }
             
-            .order-md-1 {
-                order: 1;
-            }
-            .order-md-2 {
-                order: 2;
-            }
+    .order-md-1 {
+        order: 1;
+    }
 
-            header {
-                font-size: 10px; 
-                padding: 10px; 
-                
-            }
+    .order-md-2 {
+        order: 2;
+    }
+
+    header {
+        font-size: 10px; 
+        padding: 10px; 
+    }
             
-            main{
-                padding:20px;
-            }
+    main{
+        padding:3px;
+    }
 
-            hr {
-                margin: 1rem 0;
-            }
+    footer {
+        padding: 10px; 
+        font-size: 0.8rem; 
+     }
+        
+    footer h5 {
+        font-size: 1rem; 
+    }
+        
+    footer .container-fluid {
+        padding: 0 15px; 
+    }
 
-            .registrarse{
-                margin-left:100px;
-            }
-
-            footer {
-                padding: 10px; 
-                font-size: 0.8rem;
-            }
+    footer ul {
+        padding-left: 0; 
+    }
         
-            footer h5 {
-                font-size: 1rem; 
-            }
+    footer li {
+        font-size: 0.8rem; 
+    }
         
-            footer .container-fluid {
-                padding: 0 15px; 
-            }
+    footer .social_fondo span {
+        font-size: 1.5rem; 
+    }
         
-            footer ul {
-                padding-left: 0; 
-            }
+    footer .text-center {
+        font-size: 0.8rem; 
+    }
         
-            footer li {
-                font-size: 0.8rem;
-            }
-        
-            footer .social_fondo span {
-                font-size: 1.5rem;
-            }
-        
-            footer .text-center {
-                font-size: 0.8rem;
-            }
-        
-            .footer hr {
-                margin: 0.5rem 0;
-            }
-        
-            
-
-            
-}
+    footer hr {
+        margin: 0.5rem 0; 
+    }    
+} 

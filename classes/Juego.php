@@ -163,7 +163,7 @@ class Juego
     {
         try {
             $query = "SELECT j.nombre_juego, j.precio, j.descripcion, j.editor, j.anio_edicion, j.cantidad_jugadores, j.foto, 
-                            j.duracion_minutos, j.edad_minima
+                            j.duracion_minutos, j.edad_minima, j.id_juego
                       FROM juego j
                       JOIN categoria c ON j.id_categoria = c.id_categoria
                       WHERE c.nombre_categoria LIKE :categoria";

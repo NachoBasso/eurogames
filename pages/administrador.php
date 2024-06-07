@@ -68,7 +68,7 @@ if (isset($_POST['eliminar'])) {
             <td><?= $juego['nombre_juego'] ?></td>
             <td><?= "€" . $juego['precio'] ?></td>
             <td class="align-middle"><div class="d-flex align-items-center justify-content-center">
-                    <?= substr($juego['descripcion'], 0, 20) ?>... <button class="btn btn-link ver-mas" data-bs-toggle="modal" data-bs-target="#modalJuego<?= $juego['id_juego'] ?>">Ver más</button>
+                    <?php echo"". substr($juego['descripcion'], 0, 20) ." ... "?> <button class="btn btn-link ver-mas" data-bs-toggle="modal" data-bs-target="#modalJuego<?= $juego['id_juego'] ?>">Ver más</button>
                 </div>
             </td>
             <td><?= $juego['stock'] ?></td>
