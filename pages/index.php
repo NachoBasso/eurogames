@@ -28,6 +28,7 @@ if (isset($_POST['agregar_al_carrito'])) {
   <meta name="author" content="Ignacio Basso">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
   <link rel="stylesheet" href="../css/style.css">
   <title>Eurogames - Inicio</title>
 
@@ -113,7 +114,10 @@ if (isset($_POST['agregar_al_carrito'])) {
             <div class="carousel-inner">
               <?php foreach ($listadoJuegos as $key => $juego) : ?>
                 <div class="carousel-item <?php echo $key === 0 ? 'active' : ''; ?>">
-                  <h2 class="card-title text-center text-shadow mb-5 mt-4"><?php echo $juego['nombre_juego']; ?></h2>
+                <span class="badge text-black"><?php echo "€". $juego['precio']; ?></span>  
+              <svg xmlns="http://www.w3.org/2000/svg" class="badge-certificate "  preserveAspectRatio="none" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M211 7.3C205 1 196-1.4 187.6 .8s-14.9 8.9-17.1 17.3L154.7 80.6l-62-17.5c-8.4-2.4-17.4 0-23.5 6.1s-8.5 15.1-6.1 23.5l17.5 62L18.1 170.6c-8.4 2.1-15 8.7-17.3 17.1S1 205 7.3 211l46.2 45L7.3 301C1 307-1.4 316 .8 324.4s8.9 14.9 17.3 17.1l62.5 15.8-17.5 62c-2.4 8.4 0 17.4 6.1 23.5s15.1 8.5 23.5 6.1l62-17.5 15.8 62.5c2.1 8.4 8.7 15 17.1 17.3s17.3-.2 23.4-6.4l45-46.2 45 46.2c6.1 6.2 15 8.7 23.4 6.4s14.9-8.9 17.1-17.3l15.8-62.5 62 17.5c8.4 2.4 17.4 0 23.5-6.1s8.5-15.1 6.1-23.5l-17.5-62 62.5-15.8c8.4-2.1 15-8.7 17.3-17.1s-.2-17.4-6.4-23.4l-46.2-45 46.2-45c6.2-6.1 8.7-15 6.4-23.4s-8.9-14.9-17.3-17.1l-62.5-15.8 17.5-62c2.4-8.4 0-17.4-6.1-23.5s-15.1-8.5-23.5-6.1l-62 17.5L341.4 18.1c-2.1-8.4-8.7-15-17.1-17.3S307 1 301 7.3L256 53.5 211 7.3z"/></svg>
+                  
+                  <h2 class="card-title text-center text-shadow mb-3 mt-3 p-5"><?php echo $juego['nombre_juego']; ?></h2>
                   <div class="d-flex justify-content-center"><img src="<?php echo $juego['foto']; ?>" class="d-block mt-3 mb-3 w-50 h-25" alt="<?php echo $juego['nombre_juego']; ?>"></div>
                   <h5 class="card-text text-center "><?php echo "" . substr($juego['descripcion'], 0, 70) . " ... " ?>
                     <button class="btn btn-blue-orange " data-bs-toggle="modal" data-bs-target="#juegoModal<?php echo $juego['id_juego']; ?>">VER +</button>
@@ -126,16 +130,21 @@ if (isset($_POST['agregar_al_carrito'])) {
                 <div class="modal fade" id="juegoModal<?php echo $juego['id_juego']; ?>" tabindex="-1" aria-labelledby="juegoModalLabel<?php echo $juego['id_juego']; ?>" aria-hidden="true">
                   <div class="modal-dialog ">
                     <div class="modal-content bg-eurogames-blanco">
-                      <div class="modal-header">
-                        <h5 class="modal-title text-black fs-5" id="juegoModalLabel<?php echo $juego['id_juego']; ?>">
-                          <?php echo $juego['nombre_juego']; ?></h5>
+                      <div class="modal-header d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title text-black fs-2" id="juegoModalLabel<?php echo $juego['id_juego']; ?>">
+                          <?php echo $juego['nombre_juego']; ?>
+                        </h5>
+                        <div class="ms-auto">
+                          <p class="modal-title text-black-50 fs-3 mt-2 mb-2">
+                            <strong class="text-black"><?php echo "€" . $juego['precio']; ?></strong>
+                          </p>
+                        </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body fs-5">
                         <img src="<?php echo $juego['foto']; ?>" class="d-block w-50 h-50 mx-auto mb-3" alt="<?php echo $juego['nombre_juego']; ?>">
                         <hr>
                         <p class="text-black-50 mt-5 border-top border-bottom mb-2"><strong class="text-black">Descripción:</strong> <?php echo $juego['descripcion']; ?></p>
-                        <p class="text-black-50  border-bottom mt-2 mb-2"><strong class="text-black">Precio:</strong> <?php echo "€" . $juego['precio']; ?></p>
                         <p class="text-black-50  border-bottom mt-2 mb-2"><strong class="text-black">Editor:</strong> <?php echo $juego['editor']; ?></p>
                         <p class="text-black-50  border-bottom mt-2 mb-2"><strong class="text-black">Año de Edición:</strong> <?php echo $juego['anio_edicion']; ?></p>
                         <p class="text-black-50  border-bottom mt-2 mb-2"><strong class="text-black">Jugadores:</strong> <?php echo $juego['cantidad_jugadores']; ?></p>
@@ -170,12 +179,14 @@ if (isset($_POST['agregar_al_carrito'])) {
       <div class="row">
         <div class="col-md-6 mt-5 mb-5">
           <a href="listadoJuegos.php?categoria=oferta" class="text-decoration-none">
-            <h2 class="text-center text-black text-shadow-orange mb-5">OFERTAS </h2>
+            <h2 class="text-center text-black text-shadow-orange mb-4">OFERTAS </h2>
           </a>
           <div id="carouselOferta" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
               <?php foreach ($juegosOferta as $key => $ofertas) : ?>
                 <div class="carousel-item <?php echo $key === 0 ? 'active' : ''; ?> ">
+                <span class="badge text-black"><?php echo "€". $ofertas['precio']; ?></span>  
+              <svg xmlns="http://www.w3.org/2000/svg" class="badge-certificate " viewBox="0 0 512 512"  preserveAspectRatio="none"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M211 7.3C205 1 196-1.4 187.6 .8s-14.9 8.9-17.1 17.3L154.7 80.6l-62-17.5c-8.4-2.4-17.4 0-23.5 6.1s-8.5 15.1-6.1 23.5l17.5 62L18.1 170.6c-8.4 2.1-15 8.7-17.3 17.1S1 205 7.3 211l46.2 45L7.3 301C1 307-1.4 316 .8 324.4s8.9 14.9 17.3 17.1l62.5 15.8-17.5 62c-2.4 8.4 0 17.4 6.1 23.5s15.1 8.5 23.5 6.1l62-17.5 15.8 62.5c2.1 8.4 8.7 15 17.1 17.3s17.3-.2 23.4-6.4l45-46.2 45 46.2c6.1 6.2 15 8.7 23.4 6.4s14.9-8.9 17.1-17.3l15.8-62.5 62 17.5c8.4 2.4 17.4 0 23.5-6.1s8.5-15.1 6.1-23.5l-17.5-62 62.5-15.8c8.4-2.1 15-8.7 17.3-17.1s-.2-17.4-6.4-23.4l-46.2-45 46.2-45c6.2-6.1 8.7-15 6.4-23.4s-8.9-14.9-17.3-17.1l-62.5-15.8 17.5-62c2.4-8.4 0-17.4-6.1-23.5s-15.1-8.5-23.5-6.1l-62 17.5L341.4 18.1c-2.1-8.4-8.7-15-17.1-17.3S307 1 301 7.3L256 53.5 211 7.3z"/></svg>
                   <img src="<?php echo $ofertas['foto']; ?>" class="d-flex  w-50 h-25 justify-content-center mx-auto" alt="<?php echo $ofertas['nombre_juego']; ?>">
                   <div class="d-flex justify-content-center mt-3">
                     <form method="post">
@@ -199,12 +210,15 @@ if (isset($_POST['agregar_al_carrito'])) {
         </div>
         <div class="col-md-6 mt-5 mb-5">
           <a href="listadoJuegos.php?categoria=novedad" class="text-decoration-none">
-            <h2 class="text-center text-black text-shadow-orange mb-5">NOVEDADES</h2>
+            <h2 class="text-center text-black text-shadow-orange mb-4">NOVEDADES</h2>
           </a>
           <div id="carouselNovedades" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
+            <div class="carousel-inner"> 
               <?php foreach ($juegosNovedades as $key => $novedades) : ?>
                 <div class="carousel-item <?php echo $key === 0 ? 'active' : ''; ?> ">
+                <span class="badge text-black "><?php echo "€". $novedades['precio']; ?></span>  
+              <svg xmlns="http://www.w3.org/2000/svg" class="badge-certificate "   preserveAspectRatio="none" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M211 7.3C205 1 196-1.4 187.6 .8s-14.9 8.9-17.1 17.3L154.7 80.6l-62-17.5c-8.4-2.4-17.4 0-23.5 6.1s-8.5 15.1-6.1 23.5l17.5 62L18.1 170.6c-8.4 2.1-15 8.7-17.3 17.1S1 205 7.3 211l46.2 45L7.3 301C1 307-1.4 316 .8 324.4s8.9 14.9 17.3 17.1l62.5 15.8-17.5 62c-2.4 8.4 0 17.4 6.1 23.5s15.1 8.5 23.5 6.1l62-17.5 15.8 62.5c2.1 8.4 8.7 15 17.1 17.3s17.3-.2 23.4-6.4l45-46.2 45 46.2c6.1 6.2 15 8.7 23.4 6.4s14.9-8.9 17.1-17.3l15.8-62.5 62 17.5c8.4 2.4 17.4 0 23.5-6.1s8.5-15.1 6.1-23.5l-17.5-62 62.5-15.8c8.4-2.1 15-8.7 17.3-17.1s-.2-17.4-6.4-23.4l-46.2-45 46.2-45c6.2-6.1 8.7-15 6.4-23.4s-8.9-14.9-17.3-17.1l-62.5-15.8 17.5-62c2.4-8.4 0-17.4-6.1-23.5s-15.1-8.5-23.5-6.1l-62 17.5L341.4 18.1c-2.1-8.4-8.7-15-17.1-17.3S307 1 301 7.3L256 53.5 211 7.3z"/></svg>
+                 
                   <img src="<?php echo $novedades['foto']; ?>" class="d-flex  w-50 h-25 justify-content-center mx-auto" alt="<?php echo $novedades['nombre_juego']; ?>">
                   <div class="d-flex justify-content-center mt-3">
                     <form method="post">

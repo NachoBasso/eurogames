@@ -67,10 +67,7 @@ if (isset($_POST['agregar_al_carrito'])) {
                                             </p>
                                             <hr>
                                             <p class='card-text'><strong>Precio:</strong> <?php echo $fila['precio']; ?></p>
-                                            <p class='card-text'><strong>Edad mínima:</strong> <?php echo $fila['edad_minima']; ?> años</p>
-                                            <p class='card-text'><strong>Editor:</strong> <?php echo $fila['editor']; ?></p>
-                                            <p class='card-text'><strong>Año de edición:</strong> <?php echo $fila['anio_edicion']; ?></p>
-                                            <p class='card-text'><strong>Duración:</strong> <?php echo $fila['duracion_minutos'] . " minutos."; ?></p>
+                                          
                                             <form method="post">
                                                 <input type="hidden" name="id_juego" value="<?php echo $fila['id_juego']; ?>">
                                                 <button type="submit" name="agregar_al_carrito" class="btn btn-orange-blue mb-3 mt-3">AÑADIR AL CARRITO</button>
@@ -88,7 +85,7 @@ if (isset($_POST['agregar_al_carrito'])) {
                             echo "<div class='row'>";
                             foreach ($juego->seleccionarJuegosRandom(6) as $fila) {
                             ?>
-                                <div class='col-md-4 col-sm-6 mb-4'>
+                                <div class='col-md-7 col-sm-6 mb-4'>
                                     <div class='card register-left-grey card-login text-white pr-4 pl-4 m-4'>
                                         <img src='<?php echo $fila['foto']; ?>' class='card-img-top pr-5 pl-5 m-4 w-75' alt='<?php echo $fila['nombre_juego']; ?>'>
                                         <hr class='my-4 border-top'>
@@ -99,11 +96,7 @@ if (isset($_POST['agregar_al_carrito'])) {
                                             </p>
                                             <hr>
                                             <p class='card-text'><strong>Precio:</strong> <?php echo $fila['precio']; ?></p>
-                                            <p class='card-text'><strong>Edad mínima:</strong> <?php echo $fila['edad_minima']; ?> años</p>
-                                            <p class='card-text'><strong>Jugadores:</strong> <?php echo $fila['cantidad_jugadores']; ?></p>
-                                            <p class='card-text'><strong>Editor:</strong> <?php echo $fila['editor']; ?></p>
-                                            <p class='card-text'><strong>Año de edición:</strong> <?php echo $fila['anio_edicion']; ?></p>
-                                            <p class='card-text'><strong>Duración:</strong> <?php echo $fila['duracion_minutos'] . " minutos."; ?></p>
+  
                                             <form method='post'>
                                                 <input type='hidden' name='id_juego' value='<?php echo $fila['id_juego']; ?>'>
                                                 <button type="submit" name="agregar_al_carrito" class="btn btn-orange-blue mb-3 mt-3">AÑADIR AL CARRITO</button>

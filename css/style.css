@@ -386,11 +386,38 @@ h2, h4 {
     background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url('../img/fondo3.png');
 }
 
-.x {   
-    padding:5%;
-    box-shadow: 0px 0px 10px 16px #FFA500;
-    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url('../img/fondo3.png');
+.image-container {
+    position: relative;
+    display: inline-block;
 }
+.fa-scroll{
+    width: 200%;
+    height: 150%;
+}
+
+.badge{
+    position: absolute;
+    top: 18%;
+    right: -27%;
+    transform: translate(-140%, -50%);
+    font-size:30px;
+    border-radius: 3%;
+    z-index: 2;
+}
+
+.badge-certificate{
+    position: absolute;
+    top: 15%;
+    right: -30%;
+    z-index: 1;
+    width: 139px; 
+    height:70px;
+    transform: translate(-150%, -30%); 
+    fill:#FFA500;
+    stroke:#1d4c66;
+    stroke-width:20px;
+}
+
 
 .same-height-button {
     display: flex;
@@ -838,4 +865,20 @@ https://www.youtube.com/source/QR8CVkmJhLU/shorts?bp=8gVCCjYSJwoLUVI4Q1ZrbUpoTFU
     footer hr {
         margin: 0.5rem 0; 
     }    
+
+
+    .badge {
+        top: 7%; 
+        right: -20%; 
+        transform: translate(-115%, -50%);
+        font-size: 1em; 
+    }
+
+    .badge-certificate {
+        top: 5%; 
+        right: -20%; 
+        width: 100px; 
+        height: 30px; 
+        transform: translate(-70%, -35%);
+    }
 } 
