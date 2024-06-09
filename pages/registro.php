@@ -5,13 +5,13 @@ require_once 'functions.php';
 require_once 'config.php';
 
 if (isset($_SESSION['id_usuario'])) {
+    echo "Si el usuario ya esta logueado tiene que ir a inicio.";
     header('Location: index.php');
     exit();
 }
 
 $errores = [];
 $mensajeExito = '';
-$usuario = new Usuario();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -68,13 +68,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($errores)) {
+        $usuario = new Usuario();
         $resultado = $usuario->crearUsuario($nombre, $apellido, $email, $password, $telefono, 0, null, null);
 
         if ($resultado == "Usuario creado correctamente") {
             $usuarioInfo = $usuario->obtenerUsuarioPorEmail($email);
             $_SESSION['nombre_usuario'] = $nombre;
             $_SESSION['id_usuario'] = $usuarioInfo['id_usuario'];
-
+            echo "Usuario creado correctamente pero no se va a inicio.php";
             header('Location: index.php');
             exit();
         } else {
@@ -124,12 +125,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <h2 class="text-center mt-5 mb-5 text-shadow-black">REGISTRO DE NUEVO USUARIO</h2>
                         <hr>
                     </div>
+                    <div class="d-flex justify-content-center">
+
                     <?php if (!empty($errores['general'])) : ?>
-                        <div class="alert alert-danger mt-2 p-1 fs-5 fw-bold">
+                        <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold d-flex justify-content-center">
                             <?php echo htmlspecialchars($errores['general']); ?>
                         </div>
                     <?php endif; ?>
-
+                    </div>
                     <?php if (!empty($mensajeExito)) : ?>
                         <div class="alert alert-success">
                             <?php echo htmlspecialchars($mensajeExito); ?>
@@ -139,70 +142,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <?php if (empty($mensajeExito)) : ?>
                         <form class="row g-3" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                             <div class="col-md-6 mb-2 mt-5">
-                                <label for="inputNombre" class="mb-2 fw-bolder">Nombre:</label>
-                                <input type="text" class="form-control <?php echo isset($errores['nombre']) ? 'is-invalid' : ''; ?>" id="inputNombre" name="nombre" placeholder="Ej: Juan" value="<?php echo htmlspecialchars($nombre ?? ''); ?>">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg></span>
+                                    </div>
+                                    <input type="text" placeholder="Nombre" class="form-control <?php echo isset($errores['nombre']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="nombre" name="nombre" value="<?php echo htmlspecialchars($nombre ?? '') ?>">
+                                </div>
                                 <?php if (isset($errores['nombre'])) : ?>
-                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold" role="alert">
+                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold d-flex justify-content-center" role="alert">
                                         <?php echo htmlspecialchars($errores['nombre']); ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
                             <div class="col-md-6 mb-2 mt-5">
-                                <label for="apellido" class="mb-2 fw-bolder">Apellidos:</label>
-                                <input type="text" class="form-control <?php echo isset($errores['apellido']) ? 'is-invalid' : ''; ?>" id="apellido" placeholder="Ej: Pérez Pérez" name="apellido" value="<?php echo htmlspecialchars($apellido ?? ''); ?>">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg></span>
+                                    </div>
+                                    <input type="text" placeholder="Apellido" class="form-control <?php echo isset($errores['apellido']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="apellido" name="apellido" value="<?php echo htmlspecialchars($apellido ?? '') ?>">
+                                </div>
                                 <?php if (isset($errores['apellido'])) : ?>
-                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold" role="alert">
+                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold d-flex justify-content-center" role="alert">
                                         <?php echo htmlspecialchars($errores['apellido']); ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
                             <div class="col-md-6  mb-2 mt-5">
-                                <label for="email" class="mb-2 fw-bolder">Email:</label>
-                                <input type="email" class="form-control <?php echo isset($errores['email']) ? 'is-invalid' : ''; ?>" id="email" name="email" placeholder="Ej: ejemplo@ejemplo.com" value="<?php echo htmlspecialchars($email ?? ''); ?>">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg></span>
+                                    </div>
+                                    <input type="text" placeholder="Email" class="form-control <?php echo isset($errores['email']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="email" name="email" value="<?php echo htmlspecialchars($email ?? '') ?>">
+                                </div>
                                 <?php if (isset($errores['email'])) : ?>
-                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold" role="alert">
+                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold d-flex justify-content-center" role="alert">
                                         <?php echo htmlspecialchars($errores['email']); ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
                             <div class="col-md-6  mb-2 mt-5">
-                                <label for="telefono" class="mb-2 fw-bolder">Teléfono:</label>
-                                <input type="tel" value="<?= isset($telefono) ? htmlspecialchars($telefono) : '' ?>" class="form-control  <?php echo isset($errores['telefono']) ? 'is-invalid' : ''; ?>" id="telefono" name="telefono" placeholder="Ej: 123456789" maxlength="12" minlength="6">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/></svg></span>
+                                    </div>
+                                    <input type="text" placeholder="Telefono" class="form-control <?php echo isset($errores['telefono']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="telefono" name="telefono" value="<?php echo htmlspecialchars($telefono ?? '') ?>">
+                                </div>
                                 <?php if (isset($errores['telefono'])) : ?>
-                                    <div class="alert alert-warning mt-2  p-1 fs-5 fw-bold" role="alert">
+                                    <div class="alert alert-warning mt-2  p-1 fs-5 fw-bold d-flex justify-content-center" role="alert">
                                         <?php echo htmlspecialchars($errores['telefono']); ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
+
                             <div class="col-md-6  mb-2 mt-5">
-                                <label for="password" class="mb-2 fw-bolder">Password:</label>
-                                <input type="password" class="form-control <?php echo isset($errores['password']) ? 'is-invalid' : ''; ?>" id="password" name="password">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg></span>
+                                    </div>
+                                    <input type="password" placeholder="Contraseña" class="form-control <?php echo isset($errores['password']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="password" name="password" value="<?php echo htmlspecialchars($password ?? '') ?>">
+                                </div>
                                 <?php if (isset($errores['password'])) : ?>
-                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold" role="alert">
+                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold d-flex justify-content-center" role="alert">
                                         <?php echo htmlspecialchars($errores['password']); ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
                             <div class="col-md-6  mb-2 mt-5">
-                                <label for="repetirPassword" class="mb-2 fw-bolder">Repetir password:</label>
-                                <input type="password" class="form-control <?php echo isset($errores['repetirPassword']) ? 'is-invalid' : ''; ?>" id="repetirPassword" name="repetirPassword">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg></span>
+                                    </div>
+                                    <input type="password" placeholder="Repetir Contraseña" class="form-control <?php echo isset($errores['repetirPassword']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="repetirPassword" name="repetirPassword" value="<?php echo htmlspecialchars($repetirPassword ?? '') ?>">
+                                </div>
                                 <?php if (isset($errores['repetirPassword'])) : ?>
-                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold" role="alert">
+                                    <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold text-center d-flex justify-content-center" role="alert">
                                         <?php echo htmlspecialchars($errores['repetirPassword']); ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
-                            <div class="col-md-12  d-flex justify-content-center ">
-                                <div class="form-check mt-4">
-                                    <input class="form-check-input mx-2 mt-2" type="checkbox" id="terminos" name="terminos">
-                                    <label class="form-check-label" for="terminos">
-                                        Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#terminosModal"><span class="login text-center fw-bolder text-shadow-black text-decoration-none">TÉRMINOS Y CONDICIONES</span></a>
-                                    </label>
-                                    <?php if (isset($errores['terminos'])) : ?>
-                                        <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold" role="alert">
-                                            <?php echo htmlspecialchars($errores['terminos']); ?>
-                                        </div>
-                                    <?php endif; ?>
+                            <div class="col-md-12">
+                                <div class="form-check mt-4 ">
+                                    <div class=" d-flex justify-content-center">
+                                        <input class="form-check-input p-1 mt-2" type="checkbox" id="terminos" name="terminos">
+                                        <label class="form-check-label" for="terminos">
+                                            Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#terminosModal"><span class="text-center fw-bolder text-shadow-black-mini text-decoration-none">TÉRMINOS Y CONDICIONES</span></a>
+                                        </label>
+                                    </div>
+                                    <div class=" d-flex justify-content-center">
+                                        <?php if (isset($errores['terminos'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fs-5 fw-bold text-center d-flex justify-content-center" role="alert">
+                                                <?php echo htmlspecialchars($errores['terminos']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12 justify-content-center ">
@@ -210,7 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <div class="g-recaptcha d-flex justify-content-center mt-5" data-sitekey="6LdASospAAAAAPE1pV4MDk-GJURScVLBY3cfhBeY"></div>
                                     <?php if (isset($errores['recaptcha'])) : ?>
                                         <div class="d-flex justify-content-center mt-5 mb-3">
-                                            <div class="alert alert-warning mt-2 p-1 text-center align-items-center  fs-5 fw-bold" role="alert">
+                                            <div class="alert alert-warning mt-2 p-1 text-center align-items-center fs-5 fw-bold d-flex justify-content-center" role="alert">
                                                 <?php echo htmlspecialchars($errores['recaptcha']); ?>
                                             </div>
                                         </div>
@@ -219,6 +251,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="d-flex justify-content-center mt-5 mb-3">
                                     <button type="submit" class="btn btn-orange-black mt-3 mb-3 justify-content-center btn-lg font-weight-bold">REGISTRARSE</button>
                                 </div>
+                            </div>
                         </form>
                     <?php endif; ?>
                 </div>
@@ -251,21 +284,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="../js/app.js">
-        document.getElementById('terminos').addEventListener('click', function() {
-            if (this.checked) {
-                var myModal = new bootstrap.Modal(document.getElementById('terminosModal'), {
-                    keyboard: false
-                });
-                myModal.show();
-            }
-        });
-    </script>
-
-
-
+    <script src="../js/app.js"></script>
 </body>
 
 </html>

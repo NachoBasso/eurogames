@@ -139,3 +139,13 @@ setTimeout(() => {
 }, duration);
 
 
+// $(document).ready(function() {
+//   // Mostrar el modal con el mensaje de error
+//   $('#errorModal').modal('show');
+
+//   // Iniciar el contador para redireccionar después de 7 segundos
+//   const duration = 7000;
+//   setTimeout(function() {
+//       window.location.href = "login.php";
+//   }, duration);
+// });

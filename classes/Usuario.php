@@ -97,7 +97,7 @@ class Usuario
                 return "Los datos no son correctos o el usuario ya existe. Por favor vuelva a intentarlo.";
             }
             $hash_password = password_hash($password, PASSWORD_DEFAULT);
-            $query = "INSERT INTO USUARIO (nombre_usuario, apellidos_usuario, email, password, telefono, es_administrador) 
+            $query = "INSERT INTO usuario (nombre_usuario, apellidos_usuario, email, password, telefono, es_administrador) 
                       VALUES (:nombre, :apellidos, :email, :password, :telefono, :es_administrador)";
             $stmt = $this->conexion->getConBD()->prepare($query);
             $stmt->bindParam(':nombre', $nombre);
@@ -107,6 +107,7 @@ class Usuario
             $stmt->bindParam(':telefono', $telefono);
             $stmt->bindParam(':es_administrador', $es_administrador);
             $stmt->execute();
+            return "Usuario creado correctamente";
         } catch (PDOException $e) {
             die("Error al craer el usuario existe: " . $e->getMessage() . "<br/>");
         }
@@ -116,7 +117,7 @@ class Usuario
 
     public function eliminarUsuario($id_usuario)
     {
-        $query = "DELETE FROM USUARIO WHERE id_usuario = :id_usuario";
+        $query = "DELETE FROM usuario WHERE id_usuario = :id_usuario";
         $stmt = $this->conexion->getConBD()->prepare($query);
         $stmt->bindParam(':id_usuario', $id_usuario);
         return $stmt->execute();
@@ -124,7 +125,7 @@ class Usuario
 
     public function listarUsuarios()
     {
-        $query = "SELECT id_usuario, nombre_usuario, apellidos_usuario, email, password, telefono, es_administrador FROM USUARIO";
+        $query = "SELECT id_usuario, nombre_usuario, apellidos_usuario, email, password, telefono, es_administrador FROM usuario";
         $stmt = $this->conexion->getConBD()->query($query);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -150,7 +151,7 @@ class Usuario
     public function usuarioExiste($email)
     {
         try {
-            $query = "SELECT COUNT(*) FROM USUARIO WHERE email = :email";
+            $query = "SELECT COUNT(*) FROM usuario WHERE email = :email";
             $stmt = $this->conexion->getConBD()->prepare($query);
             $stmt->bindParam(':email', $email);
             $stmt->execute();
@@ -163,7 +164,7 @@ class Usuario
     public function obtenerUsuarioPorEmail($email)
     {
         try {
-            $query = "SELECT id_usuario, nombre_usuario, apellidos_usuario, email, password, telefono, es_administrador FROM USUARIO WHERE email = :email";
+            $query = "SELECT id_usuario, nombre_usuario, apellidos_usuario, email, password, telefono, es_administrador FROM usuario WHERE email = :email";
             $stmt = $this->conexion->getConBD()->prepare($query);
             $stmt->bindParam(':email', $email);
             $stmt->execute();
@@ -177,7 +178,7 @@ class Usuario
     {
         try {
 
-            $query = "SELECT  nombre_usuario, apellidos_usuario, email, telefono FROM USUARIO WHERE id_usuario = :id_usuario";
+            $query = "SELECT  nombre_usuario, apellidos_usuario, email, telefono FROM usuario WHERE id_usuario = :id_usuario";
             $stmt = $this->conexion->getConBD()->prepare($query);
             $stmt->bindParam(':id_usuario', $id_usuario);
             $stmt->execute();
@@ -189,7 +190,7 @@ class Usuario
     public function validarPassword($id_usuario, $contrasena)
     {
         try {
-            $query = "SELECT contrasena FROM USUARIO WHERE id_usuario = :id_usuario";
+            $query = "SELECT contrasena FROM usuario WHERE id_usuario = :id_usuario";
             $stmt = $this->conexion->getConBD()->prepare($query);
             $stmt->bindParam(':id_usuario', $id_usuario);
             $stmt->execute();
@@ -206,7 +207,7 @@ class Usuario
         try {
 
             $hash_password = password_hash($nueva_contrasena, PASSWORD_DEFAULT);
-            $query = "UPDATE USUARIO SET contrasena = :nueva_contrasena WHERE id_usuario = :id_usuario";
+            $query = "UPDATE usuario SET contrasena = :nueva_contrasena WHERE id_usuario = :id_usuario";
             $stmt = $this->conexion->getConBD()->prepare($query);
             $stmt->bindParam(':nueva_contrasena', $hash_password);
             $stmt->bindParam(':id_usuario', $id_usuario);
@@ -220,7 +221,7 @@ class Usuario
     {
 
         try {
-            $query = "UPDATE USUARIO SET nombre_usuario = :nombre, apellidos_usuario = :apellidos, email = :email, telefono = :telefono WHERE id_usuario = :id_usuario";
+            $query = "UPDATE usuario SET nombre_usuario = :nombre, apellidos_usuario = :apellidos, email = :email, telefono = :telefono WHERE id_usuario = :id_usuario";
             $stmt = $this->conexion->getConBD()->prepare($query);
             $stmt->bindParam(':nombre', $nombre);
             $stmt->bindParam(':apellidos', $apellidos);

@@ -150,7 +150,20 @@ class Juego
     {
         try {
             $query = "SELECT  id_juego, nombre_juego, precio, descripcion, stock, editor, anio_edicion, cantidad_jugadores, foto, 
-                              edad_minima, duracion_minutos, id_categoria FROM JUEGO";
+                              edad_minima, duracion_minutos, id_categoria FROM juego";
+            $resultado = $this->conexion->getConBD()->query($query);
+            $resultado->setFetchMode(PDO::FETCH_ASSOC);
+            return $resultado;
+        } catch (PDOException $e) {
+            die("¡Error al listar juegos!: " . $e->getMessage() . "<br/>");
+        }
+    }
+
+    public function listarJuegosConStock()
+    {
+        try {
+            $query = "SELECT  id_juego, nombre_juego, precio, descripcion, stock, editor, anio_edicion, cantidad_jugadores, foto, 
+                              edad_minima, duracion_minutos, id_categoria FROM juego WHERE stock > 0";
             $resultado = $this->conexion->getConBD()->query($query);
             $resultado->setFetchMode(PDO::FETCH_ASSOC);
             return $resultado;
@@ -167,6 +180,26 @@ class Juego
                       FROM juego j
                       JOIN categoria c ON j.id_categoria = c.id_categoria
                       WHERE c.nombre_categoria LIKE :categoria";
+
+            $stmt = $this->conexion->getConBD()->prepare($query);
+            $categoriaParam = '%' . $categoria . '%';
+            $stmt->bindParam(':categoria', $categoriaParam, PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            return $stmt;
+        } catch (PDOException $e) {
+            die("¡Error al listar los juegos por categoria!: " . $e->getMessage() . "<br/>");
+        }
+    }
+
+    public function listarJuegosPorCategoriaConStock($categoria)
+    {
+        try {
+            $query = "SELECT j.nombre_juego, j.precio, j.descripcion, j.editor, j.anio_edicion, j.cantidad_jugadores, j.foto, 
+                            j.duracion_minutos, j.edad_minima, j.id_juego, j.stock
+                      FROM juego j
+                      JOIN categoria c ON j.id_categoria = c.id_categoria
+                      WHERE c.nombre_categoria LIKE :categoria AND stock > 0";
 
             $stmt = $this->conexion->getConBD()->prepare($query);
             $categoriaParam = '%' . $categoria . '%';
@@ -258,22 +291,73 @@ class Juego
         }
     }
 
-    public function buscarJuego($busqueda)
+    public function ordenarJuegos($juegos, $orden)
+    {
+        switch ($orden) {
+            case 'precio_asc':
+                usort($juegos, function($juego1, $juego2) {
+                    return $juego1['precio'] <=> $juego2['precio'];
+                });
+                break;
+            case 'precio_desc':
+                usort($juegos, function($juego1, $juego2) {
+                    return $juego2['precio'] <=> $juego1['precio'];
+                });
+                break;
+            case 'nombre_asc':
+                usort($juegos, function($juego1, $juego2) {
+                    return strcmp($juego1['nombre_juego'], $juego2['nombre_juego']);
+                });
+                break;
+            case 'nombre_desc':
+                usort($juegos, function($juego1, $juego2) {
+                    return strcmp($juego2['nombre_juego'], $juego1['nombre_juego']);
+                });
+                break;
+            default:
+                break;
+        }
+        return $juegos;
+    }
+
+    public function buscarJuego($busqueda, $orden = null)
     {
         try {
-            $sql = "SELECT id_juego, nombre_juego, descripcion, precio, edad_minima, duracion_minutos, editor, anio_edicion, foto 
-                    FROM juego 
-                    WHERE nombre_juego LIKE :busqueda OR descripcion LIKE :busqueda OR edad_minima LIKE :busqueda OR editor LIKE :busqueda
-                    OR anio_edicion LIKE :busqueda";
-            $stmt = $this->conexion->getConBD()->prepare($sql);
+            $query = "SELECT j.id_juego, j.nombre_juego, j.stock, j.precio, j.descripcion, j.editor, j.anio_edicion, j.cantidad_jugadores, j.foto, j.duracion_minutos, j.edad_minima, c.nombre_categoria
+                      FROM juego j
+                      JOIN categoria c ON j.id_categoria = c.id_categoria
+                      WHERE j.nombre_juego LIKE :busqueda OR c.nombre_categoria LIKE :busqueda OR j.edad_minima LIKE :busqueda OR j.editor LIKE :busqueda OR j.anio_edicion LIKE :busqueda";
+    
+            switch ($orden) {
+                case 'precio_asc':
+                    $query .= " ORDER BY j.precio ASC";
+                    break;
+                case 'precio_desc':
+                    $query .= " ORDER BY j.precio DESC";
+                    break;
+                case 'nombre_asc':
+                    $query .= " ORDER BY j.nombre_juego ASC";
+                    break;
+                case 'nombre_desc':
+                    $query .= " ORDER BY j.nombre_juego DESC";
+                    break;
+                default:
+                    break;
+            }
+    
+            $stmt = $this->conexion->getConBD()->prepare($query);
             $busqueda = "%$busqueda%";
             $stmt->bindParam(':busqueda', $busqueda, PDO::PARAM_STR);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $juegos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $juegos = $this->ordenarJuegos($juegos, $orden);
+
+            return $juegos;
         } catch (PDOException $e) {
             die('Error al buscar el juego: ' . $e->getMessage());
         }
     }
+    
 
     public function filtrarPorEditor($editor)
     {
@@ -342,9 +426,11 @@ class Juego
     public function seleccionarJuegosRandom($limit)
     {
         try {
-            $query = "SELECT id_juego, nombre_juego, precio, descripcion, stock, editor, anio_edicion, cantidad_jugadores, foto, edad_minima, duracion_minutos, id_categoria FROM JUEGO ORDER BY RAND() LIMIT $limit";
+            $query = "SELECT id_juego, nombre_juego, precio, descripcion, stock, editor, anio_edicion, cantidad_jugadores, foto, edad_minima,
+             duracion_minutos, id_categoria FROM juego WHERE stock > 0 ORDER BY RAND() LIMIT $limit";
+
             $stmt = $this->conexion->getConBD()->query($query);
-            $juegosRandom = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $juegosRandom = $stmt->fetchAll(PDO::FETCH_ASSOC);          
             return $juegosRandom;
         } catch (PDOException $e) {
             die("¡Error al seleccionar juegos random!: " . $e->getMessage() . "<br/>");
@@ -367,7 +453,7 @@ class Juego
     public function listarJuegosFiltrados($editor = null, $categoria = null, $orden = null, $edad = null, $duracion = null, $precio = null)
     {
         try {
-            $query = "SELECT j.nombre_juego, j.precio, j.descripcion, j.editor, j.anio_edicion, j.cantidad_jugadores, j.foto, j.duracion_minutos, j.edad_minima
+            $query = "SELECT j.nombre_juego, j.stock, j.precio, j.descripcion, j.editor, j.anio_edicion, j.cantidad_jugadores, j.foto, j.duracion_minutos, j.edad_minima
                     FROM juego j
                     JOIN categoria c ON j.id_categoria = c.id_categoria
                     WHERE 1=1";
@@ -436,7 +522,7 @@ class Juego
     public function editarJuego($nombre, $precio, $descripcion, $stock, $editor, $anioEdicion, $cantidadJugadores, $foto, $edadMinima, $duracion, $idCategoria, $idJuego)
     {
         try {
-            $query = "UPDATE JUEGO SET nombre_juego = :nombre, precio = :precio, descripcion = :descripcion, 
+            $query = "UPDATE juego SET nombre_juego = :nombre, precio = :precio, descripcion = :descripcion, 
                   stock = :stock, editor = :editor, anio_edicion = :anioEdicion, cantidad_jugadores = :cantidadJugadores,
                   foto = :foto, edad_minima = :edadMinima, duracion_minutos = :duracionMinutos, id_categoria = :idCategoria
                   WHERE id_juego = :idJuego";
@@ -459,9 +545,6 @@ class Juego
             die("¡Error al editar los juegos!: " . $e->getMessage() . "<br/>");
         }
     }
-
-
-
 
     public function __destruct()
     {

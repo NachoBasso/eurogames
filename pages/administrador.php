@@ -1,5 +1,5 @@
 <?php
-require_once 'conexion.php';
+require_once '../classes/Conexion.php';
 require_once '../classes/Juego.php';
 require_once 'functions.php';
 

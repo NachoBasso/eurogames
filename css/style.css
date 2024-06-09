@@ -275,7 +275,17 @@ label{
     border-radius: 20px; 
     box-shadow:  10px 10px rgba(111, 110, 109, 0.8);     
     background-color: rgb(181, 181, 185);
+    color:black;    
+}
+
+.register-grey-buscar{   
+    border-radius: 20px; 
+    box-shadow:  10px 10px rgba(111, 110, 109, 0.8);     
+    background-color: rgb(181, 181, 185);
     color:black;
+    margin-left:20px;
+    margin-right:20px;
+
 }
 
 .border-orange{
@@ -578,7 +588,7 @@ footer .nav-item {
 .carousel-caption .btn {
     font-size: 1.5rem;
 }
-  
+
 .img-dados {
     background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url('../img/dados.png');
     background-size: cover; 
@@ -599,7 +609,11 @@ footer .nav-item {
     font-weight:bolder;
     color:white;
 }
-
+.text-shadow-black-mini{
+    text-shadow: 3px  3px black;
+    font-weight:bolder;
+    color:white;
+}
 .text-shadow-blue{
     text-shadow: 2px  2px #1d4c66;
     font-weight:bolder;
@@ -823,12 +837,25 @@ https://www.youtube.com/source/QR8CVkmJhLU/shorts?bp=8gVCCjYSJwoLUVI4Q1ZrbUpoTFU
     .order-md-2 {
         order: 2;
     }
-
+    .order-md-3{
+        order:3;
+    }
+    .primero{
+        order:1;
+    }
+    .segundo{
+        order:2;
+    }
+    .tercero{
+        order:3;
+    }
     header {
         font-size: 10px; 
         padding: 10px; 
     }
-            
+    .text-center-mobile{
+        text-align: center;
+    }      
     main{
         padding:3px;
     }
@@ -880,5 +907,9 @@ https://www.youtube.com/source/QR8CVkmJhLU/shorts?bp=8gVCCjYSJwoLUVI4Q1ZrbUpoTFU
         width: 100px; 
         height: 30px; 
         transform: translate(-70%, -35%);
+    }
+    .btn-mobile {
+        padding: 0.25rem 0.5rem; /* Ajusta el padding según sea necesario */
+        font-size: 0.75rem; /* Reducir el tamaño de la fuente */
     }
 } 
