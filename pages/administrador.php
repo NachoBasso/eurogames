@@ -10,8 +10,16 @@ $datosJuego = $juego->listarJuegosCrud();
 
 if (isset($_POST['eliminar'])) {
     $idJuego = $_POST['eliminar'];
-    $juego->borrarJuego($idJuego);
-    header('Location: administrador.php');
+    $resultado =$juego->borrarJuego($idJuego);
+
+    if($resultado = 'Borrado con éxito'){
+        header('Location: administrador.php');
+
+    }else{
+        echo"No se pudo borrar el juego solicitado.";
+    }
+    
+    
 }
 
 

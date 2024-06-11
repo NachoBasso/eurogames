@@ -13,4 +13,16 @@ function iniciarSesionSiNoIniciada()
         session_start();
     }
 }
+/*
 
+<?php  
+
+echo"<pre>";
+var_dump();
+echo"</pre>";
+
+?>
+
+
+
+*/

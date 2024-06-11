@@ -10,6 +10,13 @@ $juego = new Juego();
 const IVA = 0.21;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    if(isset ($_SESSION['pedido_agregado']) && ($_SESSION['pedido_agregado']['estado'] == 'finalizado')){
+
+        unset( $_SESSION['carrito']);
+        $_SESSION['pedido_agregado']['estado'] = false;
+    }
+    
     if (isset($_POST['accion'])) {
         $idJuego = isset($_POST['id_juego']) ? limpiarDatos($_POST['id_juego']) : "";
         $stockDisponible = $juego->obtenerStockPorId($idJuego);
@@ -38,27 +45,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST['finalizar_compra'])) {
         if (isset($_SESSION['id_usuario'])) {
-            if ($juegosConStock) {
-                // Eliminar juegos sin stock del carrito al finalizar la compra
-                foreach ($juegosSinStock as $juegoSinStock) {
-                    $indice = array_search($juegoSinStock['id_juego'], $_SESSION['carrito']);
-                    if ($indice !== false) {
-                        unset($_SESSION['carrito'][$indice]);
-                    }
+            $id_seguimiento = "AE-".uniqid();
+            $_SESSION['id_seguimiento'] = $id_seguimiento;
+            $juegosConStock = false;
+            foreach ($_SESSION['resumen_compra']['juegos'] as $juegoInfo) {
+                $stockDisponible = $juego->obtenerStockPorId($juegoInfo['id_juego']);
+                if ($stockDisponible > 0) {
+                    $juegosConStock = true;
+                    break;
                 }
-                $_SESSION['carrito'] = array_values($_SESSION['carrito']); // Reindexar el array
+            }
+
+            if ($juegosConStock) {
                 $nombre = $_POST['nombre_usuario'];
                 header("Location: gestionPedido.php");
                 exit;
             } else {
                 $_SESSION['mensaje_error'] = "No puedes finalizar la compra porque no hay juegos con stock en el carrito.";
-                $_SESSION['inicio_desde_carrito'] = true;
                 header("Location: carrito.php");
                 exit;
             }
         } else {
             $_SESSION['mensaje_error'] = "DEBE INICIAR SESION PARA FINALIZAR LA COMPRA.";
-            $_SESSION['inicio_desde_carrito'] = true;
             header("Location: carrito.php");
             exit;
         }
@@ -122,40 +130,44 @@ if (isset($_SESSION['carrito']) && count($_SESSION['carrito']) > 0) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/style.css">
     <title>Eurogames - Carrito de compras</title>
+
 </head>
 <?php include 'header.php'; ?>
 
 <body class="bg-eurogames-blanco">
     <main class="mt-5">
-        <div class="container mt-5 mb-5">
+        <div class="container   mt-5 mb-5">
+            <div class="d-flex justify-content-center">
             <h1 class="mb-5 text-shadow-blue mt-5 text-center-mobile">Carrito de Compras</h1>
-
+</div>
             <?php if (isset($_SESSION['mensaje_error'])) : ?>
-                <div class="alert alert-warning w-50 mx-auto fs-5 text-center text-black" role="alert" id="error-message">
+                <div class="d-flex justify-content-center">
+                <div class="alert alert-warning w-50  p-5 fs-5 text-center text-black mb-5" role="alert" id="error-message">
                     <?php echo $_SESSION['mensaje_error']; ?>
                 </div>
                 <?php unset($_SESSION['mensaje_error']); ?>
+                </div>
             <?php endif; ?>
 
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-8 ">
                     <?php if (isset($juegosCarrito) && count($juegosCarrito) > 0) : ?>
-                        <div class="table register-grey">
-                            <table class="table table-striped text-center align-middle register-grey">
+                        <div class="table d-flex justify-content-center table-carrito"  >
+                            <table class="table-font-size w-75 register-grey table-striped text-center align-middle register-grey">
                                 <thead>
-                                    <tr class="border-3">
-                                        <th scope="col">Eurogame</th>
-                                        <th scope="col">Precio</th>
-                                        <th scope="col">Cantidad</th>
-                                        <th scope="col">Total</th>
-                                        <th scope="col"></th>
+                                    <tr>
+                                        <th >Eurogame</th>
+                                        <th >Precio</th>
+                                        <th >Cantidad</th>
+                                        <th >Total</th>
+                                        <th ></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($juegosCarrito as $juegoItem) : ?>
                                         <tr>
                                             <td class="align-middle">
-                                                <img src="<?php echo $juegoItem['foto']; ?>" class="w-50" alt="<?php echo $juegoItem['nombre_juego']; ?>" style="max-width: 90px;">
+                                                <img src="<?php echo $juegoItem['foto']; ?>" class="" alt="<?php echo $juegoItem['nombre_juego']; ?>" style="max-width: 90px;">
                                                 <p><?php echo htmlspecialchars($juegoItem['nombre_juego']); ?></p>
                                             </td>
                                             <td class="align-middle">
@@ -216,8 +228,8 @@ if (isset($_SESSION['carrito']) && count($_SESSION['carrito']) > 0) {
 
                 <?php if (isset($juegosCarrito) && count($juegosCarrito) > 0) : ?>
                     <div class="col-md-4">
-                        <div class="container-fluis register-grey">
-                            <table class="table">
+                        <div class="container-fluid register-grey">
+                            <table class="table table-font-size">
                                 <tbody>
                                     <tr class="border-3">
                                         <td class="fw-bolder border-0">Resumen de la compra:</td>

@@ -26,6 +26,7 @@ if (empty($_GET['busqueda'])) {
 if (isset($_POST['agregar_al_carrito'])) {
     $idJuego = $_POST['id_juego'];
     $_SESSION['carrito'][] = $idJuego;
+    $_SESSION['pedido_agregado']['estado'] = "por pedir";
     header("Location: buscarJuegos.php");
     exit;
 }
@@ -82,13 +83,13 @@ if (isset($_POST['agregar_al_carrito'])) {
                         <?php
                         if (count($resultados) > 0) {
                         ?> <form method="GET" class="mb-1">
-                                <div class="input-group d-flex justify-content-end">
-                                    <label for="orden" class="text-black text-shadow-bold fs-4 p-2 mb-2">ORDENAR POR:</label>
-                                    <select class="custom-select fs-4 text-shadow-bold " id="orden" name="orden" onchange="this.form.submit()">
-                                        <option value="precio_asc" class="fs-4 text-shadow-bold" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "precio_asc") ? 'selected' : ''; ?>>Precio: Menor a Mayor</option>
-                                        <option value="precio_desc" class="fs-4 text-shadow-bold" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "precio_desc") ? 'selected' : ''; ?>>Precio: Mayor a Menor</option>
-                                        <option value="nombre_asc" class="fs-4 text-shadow-bold" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "nombre_asc") ? 'selected' : ''; ?>>Nombre: A a la Z</option>
-                                        <option value="nombre_desc" class="fs-4 text-shadow-bold" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "nombre_desc") ? 'selected' : ''; ?>>Nombre: Z a la A</option>
+                                <div class="input-group d-flex justify-content-end fs-5 roboto-mono">
+                                    <label for="orden" class="text-black fs-5 fw-bolder">ORDENAR POR:</label>
+                                    <select class="custom-select  " id="orden" name="orden" onchange="this.form.submit()">
+                                        <option value="precio_asc"  <?php echo (isset($_GET['orden']) && $_GET['orden'] === "precio_asc") ? 'selected' : ''; ?>>Precio: Menor a Mayor</option>
+                                        <option value="precio_desc"  <?php echo (isset($_GET['orden']) && $_GET['orden'] === "precio_desc") ? 'selected' : ''; ?>>Precio: Mayor a Menor</option>
+                                        <option value="nombre_asc"  <?php echo (isset($_GET['orden']) && $_GET['orden'] === "nombre_asc") ? 'selected' : ''; ?>>Nombre: A a la Z</option>
+                                        <option value="nombre_desc"  <?php echo (isset($_GET['orden']) && $_GET['orden'] === "nombre_desc") ? 'selected' : ''; ?>>Nombre: Z a la A</option>
                                     </select>
                                     <input type="hidden" name="busqueda" value="<?php echo htmlspecialchars($_GET['busqueda'] ?? ''); ?>">
 
@@ -145,7 +146,7 @@ if (isset($_POST['agregar_al_carrito'])) {
                                             </div>
                                             <div class="modal-body fs-5">
                                                 <div class="d-flex justify-content-center mx-auto ">
-                                                    <img sr='<?php echo $fila['foto']; ?>' class="d-block w-50 h-50 mx-auto mb-3" alt='<?php echo $fila['nombre_juego']; ?>'>
+                                                    <img src='<?php echo $fila['foto']; ?>' class="d-block w-50 h-50 mx-auto mb-3" alt='<?php echo $fila['nombre_juego']; ?>'>
                                                 </div>
                                                 <p class="text-black-50 mt-5 border-top border-bottom mb-2"><strong class="text-black">Descripción:</strong> <?php echo $fila['descripcion']; ?></p>
                                                 <p class="text-black-50  border-bottom mt-2 mb-2"><strong class="text-black">Editor:</strong> <?php echo $fila['editor']; ?></p>

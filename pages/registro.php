@@ -96,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="author" content="Ignacio Basso">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <title>Eurogames - Nuevo Usuario</title>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -144,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-md-6 mb-2 mt-5">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg></span>
+                                    <span class="input-group-text orange-icon fs-2"><i class="fa-solid fa-user" style="color:#1d4c66;"></i></span>
                                     </div>
                                     <input type="text" placeholder="Nombre" class="form-control <?php echo isset($errores['nombre']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="nombre" name="nombre" value="<?php echo htmlspecialchars($nombre ?? '') ?>">
                                 </div>
@@ -157,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-md-6 mb-2 mt-5">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg></span>
+                                    <span class="input-group-text orange-icon fs-2"><i class="fa-solid fa-user" style="color:#1d4c66;"></i></span>
                                     </div>
                                     <input type="text" placeholder="Apellido" class="form-control <?php echo isset($errores['apellido']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="apellido" name="apellido" value="<?php echo htmlspecialchars($apellido ?? '') ?>">
                                 </div>
@@ -170,7 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-md-6  mb-2 mt-5">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg></span>
+                                    <span class="input-group-text orange-icon fs-2"><i class="fa-solid fa-envelope" style="color:#1d4c66;"></i></span>
                                     </div>
                                     <input type="text" placeholder="Email" class="form-control <?php echo isset($errores['email']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="email" name="email" value="<?php echo htmlspecialchars($email ?? '') ?>">
                                 </div>
@@ -183,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-md-6  mb-2 mt-5">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/></svg></span>
+                                        <span class="input-group-text orange-icon fs-2"><i class="fa-solid fa-phone" style="color:#1d4c66;"></i></span>
                                     </div>
                                     <input type="text" placeholder="Telefono" class="form-control <?php echo isset($errores['telefono']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="telefono" name="telefono" value="<?php echo htmlspecialchars($telefono ?? '') ?>">
                                 </div>
@@ -197,7 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-md-6  mb-2 mt-5">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg></span>
+                                        <span class="input-group-text orange-icon fs-2"><i class="fa-solid fa-key" style="color: #1d4c66;"></i></span>
                                     </div>
                                     <input type="password" placeholder="Contraseña" class="form-control <?php echo isset($errores['password']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="password" name="password" value="<?php echo htmlspecialchars($password ?? '') ?>">
                                 </div>
@@ -210,7 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-md-6  mb-2 mt-5">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text orange-icon fs-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg></span>
+                                        <span class="input-group-text orange-icon fs-2"><i class="fa-solid fa-key " style="color: #1d4c66;"></i></span>
                                     </div>
                                     <input type="password" placeholder="Repetir Contraseña" class="form-control <?php echo isset($errores['repetirPassword']) ? 'is-invalid' : (($_SERVER["REQUEST_METHOD"] == "POST") ? 'is-valid' : ''); ?>" id="repetirPassword" name="repetirPassword" value="<?php echo htmlspecialchars($repetirPassword ?? '') ?>">
                                 </div>

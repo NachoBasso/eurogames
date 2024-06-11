@@ -129,25 +129,6 @@ class Usuario
         $stmt = $this->conexion->getConBD()->query($query);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-
-    /*public function editarUsuario($id_usuario, $nombre, $apellidos, $email, $password, $telefono, $es_administrador) {
-        $query = "UPDATE USUARIO SET nombre_usuario = :nombre, apellidos_usuario = :apellidos, email = :email, 
-                  password = :password, telefono = :telefono, es_administrador = :es_administrador 
-                  WHERE id_usuario = :id_usuario";
-        $hash_password= password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->conexion->getConBD()->prepare($query);
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':id_usuario', $id_usuario);
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':apellidos', $apellidos);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':password', $hash_password);
-        $stmt->bindParam(':telefono', $telefono);
-        $stmt->bindParam(':es_administrador', $es_administrador);
-        return $stmt->execute();
-    }*/
-
     public function usuarioExiste($email)
     {
         try {
@@ -174,6 +155,18 @@ class Usuario
         }
     }
 
+    public function obtenerUsuarioPorId($id)
+    {
+        try {
+            $query = "SELECT id_usuario, nombre_usuario, apellidos_usuario, email, password, telefono, es_administrador FROM usuario WHERE id_usuario = :id";
+            $stmt = $this->conexion->getConBD()->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error al intentar obtener un usuario por su email: " . $e->getMessage() . "<br/>");
+        }
+    }
     public function listarDatosPersonales($id_usuario)
     {
         try {

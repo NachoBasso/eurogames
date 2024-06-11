@@ -1,5 +1,5 @@
 <?php
-include_once 'Conexion.php';
+include_once '../classes/Conexion.php';
 include_once 'functions.php';
 require_once '../classes/Juego.php';
 

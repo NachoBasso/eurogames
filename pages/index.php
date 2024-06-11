@@ -15,6 +15,7 @@ $nombreCategoria = "";
 if (isset($_POST['agregar_al_carrito'])) {
   $idJuego = $_POST['id_juego'];
   $_SESSION['carrito'][] = $idJuego;
+  $_SESSION['pedido_agregado']['estado'] = "por pedir";
   header("Location: index.php");
   exit;
 }

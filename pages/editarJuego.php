@@ -1,5 +1,5 @@
 <?php
-require_once 'conexion.php';
+require_once '../classes/Conexion.php';
 require_once '../classes/Juego.php';
 require_once 'functions.php';
 
@@ -93,7 +93,6 @@ if (!empty($btnActualizar)) {
         $resultado = "Error al actualizar el juego en la base de datos.";
     }
 } else {
-    echo "imprimo el get id: $idJuegoGet";
     if (!empty($idJuegoGet)) {
         $juegoAEditar = $juego->obtenerJuegoPorId($idJuegoGet);
         $nombreJuego = $juegoAEditar['nombre_juego'];
@@ -127,7 +126,7 @@ if (!empty($btnActualizar)) {
     <title>Editar Juego</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/stye.css">
+    <link rel="stylesheet" href="../css/style.css">
 
 </head>
 
@@ -139,8 +138,14 @@ if (!empty($btnActualizar)) {
 
 
         <?php if (!empty($mensajeExito)) : ?>
-            <div class="alert alert-success">
-                <?php echo htmlspecialchars($mensajeExito); ?>
+            <div class="alert alert-success justify-content-center fs-5 text-center roboto-mono text-black">
+                <?php echo htmlspecialchars($mensajeExito);
+                    echo "<script>
+                    setTimeout(function() {
+                        window.location.href = 'administrador.php';
+                    }, 2000);
+                  </script>";
+                    ?>
             </div>
         <?php endif; ?>
         <?php if (empty($mensajeExito)) : ?>

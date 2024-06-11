@@ -46,14 +46,18 @@ function rellenarDatos(checkbox) {
     document.getElementById("telefono").value = "";
   }
 }
+
 //Se utiliza en gestionPedido.php
 function copiarDatosPersonales() {
   var checkbox = document.getElementById("usarInfoPersonal");
   if (checkbox.checked) {
     document.getElementById("nombreDestinatario").value =
       document.getElementById("nombre").value;
+      console.log(  "esto probando que pasa nombre" ,document.getElementById("nombreDestinatario").value);
     document.getElementById("apellidosDestinatario").value =
       document.getElementById("apellidos").value;
+      console.log( "esto probando que pasa apellido" ,  document.getElementById("apellidosDestinatario").value
+    )
     document.getElementById("telefonoDestinatario").value =
       document.getElementById("telefono").value;
     document.getElementById("domicilioDestinatario").value =
@@ -64,13 +68,7 @@ function copiarDatosPersonales() {
       document.getElementById("provincia").value;
     document.getElementById("codigoPostalDestinatario").value =
       document.getElementById("codigoPostal").value;
-    document.getElementById("nombreDestinatario").disabled = true;
-    document.getElementById("apellidosDestinatario").disabled = true;
-    document.getElementById("telefonoDestinatario").disabled = true;
-    document.getElementById("domicilioDestinatario").disabled = true;
-    document.getElementById("localidadDestinatario").disabled = true;
-    document.getElementById("provinciaDestinatario").disabled = true;
-    document.getElementById("codigoPostalDestinatario").disabled = true;
+  
   } else {
     document.getElementById("nombreDestinatario").value = "";
     document.getElementById("apellidosDestinatario").value = "";
@@ -79,13 +77,7 @@ function copiarDatosPersonales() {
     document.getElementById("localidadDestinatario").value = "";
     document.getElementById("provinciaDestinatario").value = "";
     document.getElementById("codigoPostalDestinatario").value = "";
-    document.getElementById("nombreDestinatario").disabled = false;
-    document.getElementById("apellidosDestinatario").disabled = false;
-    document.getElementById("telefonoDestinatario").disabled = false;
-    document.getElementById("domicilioDestinatario").disabled = false;
-    document.getElementById("localidadDestinatario").disabled = false;
-    document.getElementById("provinciaDestinatario").disabled = false;
-    document.getElementById("codigoPostalDestinatario").disabled = false;
+ 
   }
 }
 

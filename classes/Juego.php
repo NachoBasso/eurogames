@@ -228,19 +228,23 @@ class Juego
     }
 
     public function borrarJuego($idJuego)
-    {
-        try {
-            $datos = array(':id' => $idJuego);
-            $resultado = $this->conexion->getConBD()->prepare("DELETE FROM juego WHERE id_juego = :idJuego");
-            $resultado->execute($datos);
+{
+    try {
+        $datos = array(':idJuego' => $idJuego);
+        $resultado = $this->conexion->getConBD()->prepare("DELETE FROM juego WHERE id_juego = :idJuego");
+        $resultado->execute($datos);
 
-            if ($resultado->rowCount() == 0) {
-                echo "El id $idJuego es incorrecto. No es posible borrar el juego.";
-            }
-        } catch (PDOException $e) {
-            die("¡Error al borrar el juego!: " . $e->getMessage() . "<br/>");
+        if ($resultado->rowCount() == 0) {
+            throw new Exception("El id $idJuego es incorrecto. No es posible borrar el juego.");
+        } else {
+            return "Borrado con éxito";
         }
+    } catch (PDOException $e) {
+        die("¡Error al borrar el juego!: " . $e->getMessage() . "<br/>");
+    } catch (Exception $e) {
+        return $e->getMessage();
     }
+}
 
     public function crearJuego($nombre, $precio, $descripcion, $stock, $editor, $anio_edicion, $cantidad_jugadores, $rutaImagen, $edad_minima, $duracion, $id_categoria)
     {
@@ -375,7 +379,11 @@ class Juego
     public function filtrarPorPrecio($precio)
     {
         try {
-            $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, duracion_minutos, edad_minima FROM juego WHERE precio <= :precio";
+            if ($precio <= 51) {
+                $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, duracion_minutos, edad_minima FROM juego WHERE precio <= :precio";
+            } else {
+                $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, duracion_minutos, edad_minima FROM juego WHERE precio > 50";
+            }
             $stmt = $this->conexion->getConBD()->prepare($sql);
             $stmt->bindValue(':precio', $precio);
             $stmt->execute();
@@ -384,11 +392,16 @@ class Juego
             die("¡Error al filtrar por precio!: " . $e->getMessage() . "<br/>");
         }
     }
+    
 
     public function filtrarPorDuracion($duracion)
     {
         try {
-            $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, edad_minima, duracion_minutos FROM juego WHERE duracion_minutos <= :duracion_minutos";
+            if ($duracion <= 90) {
+                $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, duracion_minutos, edad_minima FROM juego WHERE duracion_minutos <= :duracion_minutos";
+            } else {
+                $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, duracion_minutos, edad_minima FROM juego WHERE duracion_minutos > 90";
+            }
             $stmt = $this->conexion->getConBD()->prepare($sql);
             $stmt->bindValue(':duracion_minutos', $duracion);
             $stmt->execute();
@@ -400,9 +413,13 @@ class Juego
 
     public function filtrarPorEdadMinima($edadMinima)
     {
-        try {
-            $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, edad_minima, duracion_minutos FROM juego WHERE edad_minima <= :edad_minima";
-            $stmt = $this->conexion->getConBD()->prepare($sql);
+        
+            try {
+                if ($edadMinima <= 15) {
+                    $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, duracion_minutos, edad_minima FROM juego WHERE edad_minima <= :edad_minima";
+                } else {
+                    $sql = "SELECT nombre_juego, precio, descripcion, editor, anio_edicion, cantidad_jugadores, foto, duracion_minutos, edad_minima FROM juego WHERE edad_minima > 15";
+                }            $stmt = $this->conexion->getConBD()->prepare($sql);
             $stmt->bindValue(':edad_minima', $edadMinima);
             $stmt->execute();
             return $stmt;
@@ -422,6 +439,7 @@ class Juego
             die("¡Error al obtener los editores!: " . $e->getMessage() . "<br/>");
         }
     }
+    
 
     public function seleccionarJuegosRandom($limit)
     {
@@ -453,11 +471,11 @@ class Juego
     public function listarJuegosFiltrados($editor = null, $categoria = null, $orden = null, $edad = null, $duracion = null, $precio = null)
     {
         try {
-            $query = "SELECT j.nombre_juego, j.stock, j.precio, j.descripcion, j.editor, j.anio_edicion, j.cantidad_jugadores, j.foto, j.duracion_minutos, j.edad_minima
+            $query = "SELECT j.id_juego, j.stock, j.nombre_juego, j.precio, j.descripcion, j.editor, j.anio_edicion, j.cantidad_jugadores, j.foto, j.duracion_minutos, j.edad_minima, c.nombre_categoria
                     FROM juego j
                     JOIN categoria c ON j.id_categoria = c.id_categoria
-                    WHERE 1=1";
-
+                   ";
+    
             if ($editor !== null) {
                 $query .= " AND j.editor = :editor";
             }
@@ -465,16 +483,57 @@ class Juego
                 $query .= " AND c.nombre_categoria LIKE :categoria";
             }
             if ($edad !== null) {
-                $query .= " AND j.edad_minima >= :edad";
+                switch ($edad) {
+                    case '6':
+                        $query .= " AND j.edad_minima BETWEEN 0 AND 6";
+                        break;
+                    case '10':
+                        $query .= " AND j.edad_minima BETWEEN 6 AND 10";
+                        break;
+                        case '14':
+                            $query .= " AND j.edad_minima BETWEEN 10 AND 14";
+                            break;
+                    case '15':
+                        $query .= " AND j.edad_minima > 14";
+                        break;
+                    default:
+                        break;
+                }                
             }
             if ($duracion !== null) {
-                $query .= " AND j.duracion_minutos >= :duracion";
+                switch ($duracion) {
+                    case '30':
+                        $query .= " AND j.duracion_minutos BETWEEN 0 AND 30";
+                        break;
+                    case '60':
+                        $query .= " AND j.duracion_minutos BETWEEN 30 AND 60";
+                        break;
+                        case '90':
+                            $query .= " AND j.duracion_minutos BETWEEN 60 AND 90";
+                            break;
+                    case '91':
+                        $query .= " AND j.duracion_minutos > 90";
+                        break;
+                    default:
+                        break;
+                }
             }
             if ($precio !== null) {
-                $precioParam = explode('-', $precio);
-                $query .= " AND j.precio >= :precio";
+                switch ($precio) {
+                    case '20':
+                        $query .= " AND j.precio BETWEEN 5 AND 20";
+                        break;
+                    case '50':
+                        $query .= " AND j.precio BETWEEN 20 AND 50";
+                        break;
+                    case '51':
+                        $query .= " AND j.precio > 50";
+                        break;
+                    default:
+                        break;
+                }
             }
-
+    
             switch ($orden) {
                 case 'precio_asc':
                     $query .= " ORDER BY j.precio ASC";
@@ -491,26 +550,19 @@ class Juego
                 default:
                     break;
             }
-
+    
             $stmt = $this->conexion->getConBD()->prepare($query);
-
+    
             if ($editor !== null) {
                 $stmt->bindParam(':editor', $editor);
             }
+            
             if ($categoria !== null) {
                 $categoriaParam = '%' . $categoria . '%';
                 $stmt->bindParam(':categoria', $categoriaParam);
             }
-            if ($edad !== null) {
-                $stmt->bindParam(':edad', $edad, PDO::PARAM_INT);
-            }
-            if ($duracion !== null) {
-                $stmt->bindParam(':duracion', $duracion, PDO::PARAM_INT);
-            }
-            if ($precio !== null) {
-                $stmt->bindParam(':precio', $precioParam[0], PDO::PARAM_INT);
-            }
-
+           
+    
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             return $stmt;
@@ -518,6 +570,9 @@ class Juego
             die("¡Error al filtrar los juegos!: " . $e->getMessage() . "<br/>");
         }
     }
+    
+    
+    
 
     public function editarJuego($nombre, $precio, $descripcion, $stock, $editor, $anioEdicion, $cantidadJugadores, $foto, $edadMinima, $duracion, $idCategoria, $idJuego)
     {

@@ -124,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../css/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
@@ -166,10 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div class="input-group form-group mt-5 m-auto w-75">
                             <div class="input-group-prepend">
-                                <span class="input-group-text orange-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Icon -->
-                                    <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z" />
-                                    </svg>
-                                </span>
+                            <span class="input-group-text orange-icon fs-2"><i class="fa-solid fa-user" style="color:#1d4c66;"></i></span>
+
                             </div>
                             <input type="text" class="form-control shadow <?= isset($errores['email']) ? 'is-invalid' : (isset($email) && !empty($email) && !isset($errores['email']) ? 'is-valid' : '') ?>" id="email" name="email" placeholder="Email" value="<?= isset($email) ? $email : '' ?>">                        </div>
                         <div class="d-flex justify-content-center">
@@ -182,9 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="input-group form-group mt-5 m-auto w-75">
                             <div class="input-group-prepend">
-                                <span class="input-group-text orange-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Icon -->
-                                        <path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z" />
-                                    </svg></span>
+                                <span class="input-group-text orange-icon fs-2"><i class="fa-solid fa-key" style="color: #1d4c66;"></i></span>
                             </div>
                             <input type="password" class="form-control <?= isset($errores['password']) ? 'is-invalid' : (($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($errores['password']) && !empty($password)) ? 'is-valid' : '') ?>" placeholder="Contraseña" id="password" name="password" value="<?= htmlspecialchars($password ?? '') ?>" maxlength="30" minlength="5">
                             

@@ -1,6 +1,9 @@
 <?php
 session_start();
-require_once '../classes/Usuario.php'; 
+require_once '../classes/Conexion.php';
+
+require_once '../classes/Usuario.php';
+require_once '../classes/Pedido.php';
 require_once 'functions.php';
 
 
@@ -30,11 +33,13 @@ if ($id_usuario) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
+
+
     $nombre = isset($_POST['nombre']) ? limpiarDatos($_POST['nombre']) : "";
     $apellidos = isset($_POST['apellidos']) ? limpiarDatos($_POST['apellidos']) : "";
     $email = isset($_POST['email']) ? limpiarDatos($_POST['email']) : "";
     $domicilio = isset($_POST['domicilio']) ? limpiarDatos($_POST['domicilio']) : "";
-    $cifONif = isset($_POST['cifONif']) ? limpiarDatos($_POST['cifONif']) : "";
+    $cifNif = isset($_POST['cifNif']) ? limpiarDatos($_POST['cifNif']) : "";
     $telefono = isset($_POST['telefono']) ? limpiarDatos($_POST['telefono']) : "";
     $localidad = isset($_POST['localidad']) ? limpiarDatos($_POST['localidad']) : "";
     $provincia = isset($_POST['provincia']) ? limpiarDatos($_POST['provincia']) : "";
@@ -46,6 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $localidadDestinatario = isset($_POST['localidadDestinatario']) ? limpiarDatos($_POST['localidadDestinatario']) : "";
     $provinciaDestinatario = isset($_POST['provinciaDestinatario']) ? limpiarDatos($_POST['provinciaDestinatario']) : "";
     $codigoPostalDestinatario = isset($_POST['codigoPostalDestinatario']) ? limpiarDatos($_POST['codigoPostalDestinatario']) : "";
+    $metodoEnvio = isset($_POST['metodoEnvio']) ? limpiarDatos($_POST['metodoEnvio']) : "";
+    $metodoPago = isset($_POST['metodoPago']) ? limpiarDatos($_POST['metodoPago']) : "";
+    $nroSeguimiento = isset($_SESSION['id_seguimiento']) ? $_SESSION['id_seguimiento'] : null;
 
     if (empty($nombre)) {
         $errores['nombre'] = 'El nombre es obligatorio.';
@@ -65,8 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($telefono)) {
         $errores['telefono'] = 'El teléfono es obligatorio.';
     }
-    if (empty($cifONif)) {
-        $errores['cifONif'] = 'El CIF / NIF es obligatorio.';
+    if (empty($cifNif)) {
+        $errores['cifNif'] = 'El CIF / NIF es obligatorio.';
     }
 
     if (empty($provincia)) {
@@ -105,20 +113,67 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($codigoPostalDestinatario)) {
         $errores['codigoPostalDestinatario'] = 'Campo obligatorio.';
     }
+    $usarInfoPersonal = isset($_POST['usarInfoPersonal']) ? limpiarDatos($_POST['usarInfoPersonal']) : "";
 
-
-    if (empty($errores)) {
-        $_SESSION['facturacion'] = $_POST;
-        $resultado = "Factura creada correctamente";
-
-        header('Location: index.php');
-        exit();
-
-        /*PUEDO CREAR UNA FACTURA*/
-    } else {
-        $errores['general'] = $resultado;
+    if (!empty($usarInfoPersonal)) {
+        $nombreDestinatario = $nombre;
+        $apellidosDestinatario = $apellidos;
+        $domicilioDestinatario = $domicilio;
+        $telefonoDestinatario = $telefono;
+        $localidadDestinatario = $localidad;
+        $provinciaDestinatario = $provincia;
+        $codigoPostalDestinatario = $codigoPostal;
     }
-}
+    if (empty($errores)) {
+        $detallesPedido = array();
+        $nroSeguimiento = $_SESSION['id_seguimiento']; 
+    
+        foreach ($_SESSION['resumen_compra']['juegos'] as $juego) {
+            $detalle = array(
+                'id_juego' => $juego['id_juego'],
+                'cantidad' => $juego['cantidad']
+            );
+            $detallesPedido[] = $detalle;
+        }
+    }
+        $pedido = new Pedido();
+        $resultado = $pedido->crearPedido(
+            $id_usuario,
+            $domicilio,
+            $cifNif,
+            8,
+            $provincia,
+            $localidad,
+            $codigoPostal,
+            $domicilioDestinatario,
+            $nombreDestinatario,
+            $apellidosDestinatario,
+            $telefonoDestinatario,
+            $localidadDestinatario,
+            $provinciaDestinatario,
+            $codigoPostalDestinatario,
+            $nroSeguimiento, 
+            $metodoEnvio,
+            $metodoPago,
+            $detallesPedido
+        );
+        if ($resultado == "Pedido creado correctamente") {
+            // Actualizar la sesión y redirigir a la página de compra exitosa
+            $_SESSION['pedido_agregado']['estado'] = "finalizado";
+            $_SESSION['carrito'] = [];
+            header('Location: compraExitosa.php');
+            exit();
+        } else {
+            // Si hay un error al crear el pedido, mostrar el error
+            $errores['general'] = $resultado;
+        }
+    } else {
+        // Si hay errores, registrarlos en el registro de errores
+        error_log("Errores encontrados: " . print_r($errores, true));
+    }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -143,302 +198,285 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="register-right text-white mt-2 py-5">
                         <h2 class="mb-5 text-shadow-black mt-2 text-center">FINALIZAR COMPRA</h2>
                         <hr>
-                        <?php if (!empty($errores['general'])) : ?>
-                            <div class="alert alert-danger">
-                                <?php echo htmlspecialchars($errores['general']); ?>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (!empty($mensajeExito)) : ?>
-                            <div class="alert alert-success">
-                                <?php echo htmlspecialchars($mensajeExito); ?>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (empty($mensajeExito)) : ?>
-                            <div class="row">
-                                <div class="col-md-6 mx-auto p-4">
-                                    <form class="row g-3 p-2 form-mobile" method="post" id="1" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                                        <div class="d-flex justify-content-center mt-2 mb-3">
-                                            <h3 class="text-white text-shadow-black text-center">Datos Personales para Facturación</h3>
-                                        </div>
-                                        <!-- Esta parte del código fue reformulada por chatGPT -->
-                                        <div class="form-check mb-3 mr-5">
-                                            <input type="checkbox" class="form-check-input" id="usarInfoGuardada" onclick="rellenarDatos(this)"
-                                                data-nombre="<?= isset($nombreUsuario) ? htmlspecialchars($nombreUsuario) : '' ?>" 
-                                                data-apellidos="<?= isset($apellidosUsuario) ? htmlspecialchars($apellidosUsuario) : '' ?>" 
-                                                data-email="<?= isset($emailUsuario) ? htmlspecialchars($emailUsuario) : '' ?>" 
-                                                data-telefono="<?= isset($telefonoUsuario) ? htmlspecialchars($telefonoUsuario) : '' ?>" checked>
-                                            <label class="form-check-label" for="usarInfoGuardada">Usar mi información guardada</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="nombre">Nombre</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['nombre']) ? 'is-invalid' : ''; ?>" id="nombre" name="nombre" placeholder="Ej: Juan" value="<?php echo htmlspecialchars($nombreUsuario); ?>">
-                                            <?php if (isset($errores['nombre'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['nombre']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="apellidos">Apellidos</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['apellidos']) ? 'is-invalid' : ''; ?>" id="apellidos" placeholder="Ej: Pérez Pérez" name="apellidos" value="<?php echo htmlspecialchars($apellidosUsuario); ?>">
-                                            <?php if (isset($errores['apellidos'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['apellidos']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control <?php echo isset($errores['email']) ? 'is-invalid' : ''; ?>" id="email" name="email" placeholder="Ej: ejemplo@ejemplo.com" value="<?php echo htmlspecialchars($emailUsuario); ?>">
-                                            <?php if (isset($errores['email'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['email']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="telefono">Teléfono</label>
-                                            <input type="tel" value="<?= isset($telefonoUsuario) ? htmlspecialchars($telefonoUsuario) : '' ?>" class="form-control  <?php echo isset($errores['telefono']) ? 'is-invalid' : ''; ?>" id="telefono" name="telefono" placeholder="Ej: 123456789" maxlength="12" minlength="6">
-                                            <?php if (isset($errores['telefono'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['telefono']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="cifONif">CIF / NIF</label>
-                                            <input type="text" value="<?= isset($cifONif) ? htmlspecialchars($cifONif) : '' ?>" class="form-control  <?php echo isset($errores['cifONif']) ? 'is-invalid' : ''; ?>" id="cifONif" name="cifONif" placeholder="Ej: 123456789" maxlength="9" minlength="8">
-                                            <?php if (isset($errores['cifONif'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['cifONif']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="direccion">Domicilio</label>
-                                            <input type="text" value="<?= isset($domicilio) ? htmlspecialchars($domicilio) : '' ?>" class="form-control  <?php echo isset($errores['domicilio']) ? 'is-invalid' : ''; ?>" id="domicilio" name="domicilio" placeholder="Ej: Mi Calle 5, Piso 1 Depto 2" minlength="6">
-                                            <?php if (isset($errores['domicilio'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['domicilio']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-4  mb-2">
-                                            <label for="localidad">Localidad</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['localidad']) ? 'is-invalid' : ''; ?>" id="localidad" placeholder="Ej: Madrid" name="localidad" value="<?php echo htmlspecialchars($localidad ?? ''); ?>">
-                                            <?php if (isset($errores['localidad'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['localidad']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-4  mb-2">
-                                            <label for="provincia">Provincia</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['provincia']) ? 'is-invalid' : ''; ?>" id="provincia" placeholder="Ej: Madrid" name="provincia" value="<?php echo htmlspecialchars($provincia ?? ''); ?>">
-                                            <?php if (isset($errores['provincia'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['provincia']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-4 mb-2">
-                                            <label for="codigoPostal">CP</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['codigoPostal']) ? 'is-invalid' : ''; ?>" id="codigoPostal" placeholder="Ej: 28001" name="codigoPostal" value="<?php echo htmlspecialchars($codigoPostal ?? ''); ?>">
-                                            <?php if (isset($errores['codigoPostal'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['codigoPostal']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mx-auto p-4">
+                                <form class="row g-3 p-2 form-mobile" method="post" id="1" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                    <div class="d-flex justify-content-center mt-2 mb-3">
+                                        <h3 class="text-white text-shadow-black text-center">Datos Personales para Facturación</h3>
+                                    </div>
+                                    <!-- Esta parte del código fue reformulada por chatGPT -->
+                                    <div class="form-check mb-3 mr-5">
+                                        <input type="checkbox" class="form-check-input" id="usarInfoGuardada" onclick="rellenarDatos(this)" data-nombre="<?= isset($nombreUsuario) ? htmlspecialchars($nombreUsuario) : '' ?>" data-apellidos="<?= isset($apellidosUsuario) ? htmlspecialchars($apellidosUsuario) : '' ?>" data-email="<?= isset($emailUsuario) ? htmlspecialchars($emailUsuario) : '' ?>" data-telefono="<?= isset($telefonoUsuario) ? htmlspecialchars($telefonoUsuario) : '' ?>" checked>
+                                        <label class="form-check-label" for="usarInfoGuardada">Usar mi información guardada</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="nombre">Nombre</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['nombre']) ? 'is-invalid' : ''; ?>" id="nombre" name="nombre" placeholder="Ej: Juan" value="<?php echo htmlspecialchars($nombreUsuario); ?>">
+                                        <?php if (isset($errores['nombre'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['nombre']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="apellidos">Apellidos</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['apellidos']) ? 'is-invalid' : ''; ?>" id="apellidos" placeholder="Ej: Pérez Pérez" name="apellidos" value="<?php echo htmlspecialchars($apellidosUsuario); ?>">
+                                        <?php if (isset($errores['apellidos'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['apellidos']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control <?php echo isset($errores['email']) ? 'is-invalid' : ''; ?>" id="email" name="email" placeholder="Ej: ejemplo@ejemplo.com" value="<?php echo htmlspecialchars($emailUsuario); ?>">
+                                        <?php if (isset($errores['email'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['email']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="telefono">Teléfono</label>
+                                        <input type="tel" value="<?= isset($telefonoUsuario) ? htmlspecialchars($telefonoUsuario) : '' ?>" class="form-control  <?php echo isset($errores['telefono']) ? 'is-invalid' : ''; ?>" id="telefono" name="telefono" placeholder="Ej: 123456789" maxlength="12" minlength="6">
+                                        <?php if (isset($errores['telefono'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['telefono']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cifNif">CIF / NIF</label>
+                                        <input type="text" value="<?= isset($cifNif) ? htmlspecialchars($cifNif) : '' ?>" class="form-control  <?php echo isset($errores['cifNif']) ? 'is-invalid' : ''; ?>" id="cifNif" name="cifNif" placeholder="Ej: 123456789">
+                                        <?php if (isset($errores['cifNif'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['cifNif']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="domicilio">Domicilio</label>
+                                        <input type="text" value="<?= isset($domicilio) ? htmlspecialchars($domicilio) : '' ?>" class="form-control  <?php echo isset($errores['domicilio']) ? 'is-invalid' : ''; ?>" id="domicilio" name="domicilio" placeholder="Ej: Mi Calle 5, Piso 1 Depto 2">
+                                        <?php if (isset($errores['domicilio'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['domicilio']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-4  mb-2">
+                                        <label for="localidad">Localidad</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['localidad']) ? 'is-invalid' : ''; ?>" id="localidad" placeholder="Ej: Madrid" name="localidad" value="<?php echo htmlspecialchars($localidad ?? ''); ?>">
+                                        <?php if (isset($errores['localidad'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['localidad']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-4  mb-2">
+                                        <label for="provincia">Provincia</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['provincia']) ? 'is-invalid' : ''; ?>" id="provincia" placeholder="Ej: Madrid" name="provincia" value="<?php echo htmlspecialchars($provincia ?? ''); ?>">
+                                        <?php if (isset($errores['provincia'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['provincia']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="codigoPostal">CP</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['codigoPostal']) ? 'is-invalid' : ''; ?>" id="codigoPostal" placeholder="Ej: 28001" name="codigoPostal" value="<?php echo htmlspecialchars($codigoPostal ?? ''); ?>">
+                                        <?php if (isset($errores['codigoPostal'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['codigoPostal']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <hr>
+
+                                    <div class="d-flex justify-content-center mt-2">
+                                        <h3 class="text-white text-shadow-black">Datos de Envío</h3>
+                                    </div>
+                                    <div class="form-check mb-3 mr-5">
+                                        <input type="checkbox" class="form-check-input" id="usarInfoPersonal" value="usarInfoPersonal" onclick="copiarDatosPersonales()">
+                                        <label class="form-check-label" for="usarInfoPersonal">Usar datos personales para facturación </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="nombreDestinatario">Nombre</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['nombreDestinatario']) ? 'is-invalid' : ''; ?>" id="nombreDestinatario" name="nombreDestinatario" placeholder="Ej: Juan" value="<?php echo htmlspecialchars($nombreDestinatario ?? ''); ?>">
+                                        <?php if (isset($errores['nombreDestinatario'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['nombreDestinatario']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="apellidosDestinatario">Apellidos</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['apellidosDestinatario']) ? 'is-invalid' : ''; ?>" id="apellidosDestinatario" placeholder="Ej: Pérez Pérez" name="apellidosDestinatario" value="<?php echo htmlspecialchars($apellidosDestinatario ?? ''); ?>">
+                                        <?php if (isset($errores['apellidosDestinatario'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['apellidosDestinatario']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="telefonoDestinatario">Teléfono</label>
+                                        <input type="tel" value="<?= isset($telefonoDestinatario) ? htmlspecialchars($telefonoDestinatario) : '' ?>" class="form-control  <?php echo isset($errores['telefonoDestinatario']) ? 'is-invalid' : ''; ?>" id="telefonoDestinatario" name="telefonoDestinatario" placeholder="Ej: 123456789" maxlength="12" minlength="6">
+                                        <?php if (isset($errores['telefonoDestinatario'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['telefonoDestinatario']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="direccionDestinatario">Domicilio</label>
+                                        <input type="text" value="<?= isset($domicilioDestinatario) ? htmlspecialchars($domicilioDestinatario) : '' ?>" class="form-control  <?php echo isset($errores['domicilioDestinatario']) ? 'is-invalid' : ''; ?>" id="domicilioDestinatario" name="domicilioDestinatario" placeholder="Ej: Mi Calle 5, Piso 1 Depto 2" minlength="6">
+                                        <?php if (isset($errores['domicilioDestinatario'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['domicilioDestinatario']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="localidadDestinatario">Localidad</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['localidadDestinatario']) ? 'is-invalid' : ''; ?>" id="localidadDestinatario" placeholder="Ej: Madrid" name="localidadDestinatario" value="<?php echo htmlspecialchars($localidadDestinatario ?? ''); ?>">
+                                        <?php if (isset($errores['localidadDestinatario'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['localidadDestinatario']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="provinciaDestinatario">Provincia</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['provinciaDestinatario']) ? 'is-invalid' : ''; ?>" id="provinciaDestinatario" placeholder="Ej: Madrid" name="provinciaDestinatario" value="<?php echo htmlspecialchars($provinciaDestinatario ?? ''); ?>">
+                                        <?php if (isset($errores['provinciaDestinatario'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['provinciaDestinatario']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="codigoPostalDestinatario">CP</label>
+                                        <input type="text" class="form-control <?php echo isset($errores['codigoPostalDestinatario']) ? 'is-invalid' : ''; ?>" id="codigoPostalDestinatario" placeholder="Ej: 28001" name="codigoPostalDestinatario" value="<?php echo htmlspecialchars($codigoPostalDestinatario ?? ''); ?>">
+                                        <?php if (isset($errores['codigoPostalDestinatario'])) : ?>
+                                            <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
+                                                <?php echo htmlspecialchars($errores['codigoPostalDestinatario']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-12">
                                         <hr>
 
                                         <div class="d-flex justify-content-center mt-2">
-                                            <h3 class="text-white text-shadow-black">Datos de Envío</h3>
+                                            <h3 class="text-white text-shadow-black mb-4">Método de Envío</h3>
                                         </div>
-                                        <div class="form-check mb-3 mr-5">
-                                            <input type="checkbox" class="form-check-input" id="usarInfoPersonal" onclick="copiarDatosPersonales()">
-                                            <label class="form-check-label" for="usarInfoPersonal">Usar datos personales para facturación </label>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="metodoEnvio" id="recogerLocal" value="Retirar en local">
+                                            <label class="form-check-label text-white" for="recogerLocal">Recoge en nuestro local por €0</label>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label for="nombreDestinatario">Nombre</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['nombreDestinatario']) ? 'is-invalid' : ''; ?>" id="nombreDestinatario" name="nombreDestinatario" placeholder="Ej: Juan" value="<?php echo htmlspecialchars($nombreDestinatario ?? ''); ?>">
-                                            <?php if (isset($errores['nombreDestinatario'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['nombreDestinatario']); ?>
-                                                </div>
-                                            <?php endif; ?>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="metodoEnvio" id="envioDomicilio" value="Envio a Domicilio" checked>
+                                            <label class="form-check-label text-white" for="envioDomicilio">Envío a domicilio a €0</label>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label for="apellidosDestinatario">Apellidos</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['apellidosDestinatario']) ? 'is-invalid' : ''; ?>" id="apellidosDestinatario" placeholder="Ej: Pérez Pérez" name="apellidosDestinatario" value="<?php echo htmlspecialchars($apellidosDestinatario ?? ''); ?>">
-                                            <?php if (isset($errores['apellidosDestinatario'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['apellidosDestinatario']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="telefono">Teléfono</label>
-                                            <input type="tel" value="<?= isset($telefonoDestinatario) ? htmlspecialchars($telefonoDestinatario) : '' ?>" class="form-control  <?php echo isset($errores['telefonoDestinatario']) ? 'is-invalid' : ''; ?>" id="telefonoDestinatario" name="telefonoDestinatario" placeholder="Ej: 123456789" maxlength="12" minlength="6">
-                                            <?php if (isset($errores['telefono'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['telefonoDestinatario']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="direccionDestinatario">Domicilio</label>
-                                            <input type="text" value="<?= isset($domicilioDestinatario) ? htmlspecialchars($domicilioDestinatario) : '' ?>" class="form-control  <?php echo isset($errores['domicilioDestinatario']) ? 'is-invalid' : ''; ?>" id="domicilioDestinatario" name="domicilioDestinatario" placeholder="Ej: Mi Calle 5, Piso 1 Depto 2" minlength="6">
-                                            <?php if (isset($errores['domicilioDestinatario'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['domicilioDestinatario']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="localidadDestinatario">Localidad</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['localidadDestinatario']) ? 'is-invalid' : ''; ?>" id="localidadDestinatario" placeholder="Ej: Madrid" name="localidadDestinatario" value="<?php echo htmlspecialchars($localidadDestinatario ?? ''); ?>">
-                                            <?php if (isset($errores['localidadDestinatario'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['localidadDestinatario']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="provinciaDestinatario">Provincia</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['provinciaDestinatario']) ? 'is-invalid' : ''; ?>" id="provinciaDestinatario" placeholder="Ej: Madrid" name="provinciaDestinatario" value="<?php echo htmlspecialchars($provinciaDestinatario ?? ''); ?>">
-                                            <?php if (isset($errores['provinciaDestinatario'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['provinciaDestinatario']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="codigoPostalDestinatario">CP</label>
-                                            <input type="text" class="form-control <?php echo isset($errores['codigoPostalDestinatario']) ? 'is-invalid' : ''; ?>" id="codigoPostalDestinatario" placeholder="Ej: 28001" name="codigoPostalDestinatario" value="<?php echo htmlspecialchars($codigoPostalDestinatario ?? ''); ?>">
-                                            <?php if (isset($errores['codigoPostalDestinatario'])) : ?>
-                                                <div class="alert alert-warning mt-2 p-1 fw-bold" role="alert">
-                                                    <?php echo htmlspecialchars($errores['codigoPostal']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <hr>
 
-                                            <div class="d-flex justify-content-center mt-2">
-                                                <h3 class="text-white text-shadow-black mb-4">Método de Envío</h3>
-                                            </div>
-                                            <div class="form-check mb-2">
-                                                <input class="form-check-input" type="radio" name="metodoEnvio" id="recogerLocal" value="recogerLocal">
-                                                <label class="form-check-label text-white" for="recogerLocal">Recoge en nuestro local por €0</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="metodoEnvio" id="envioDomicilio" value="envioDomicilio" checked>
-                                                <label class="form-check-label text-white" for="envioDomicilio">Envío a domicilio a €0</label>
-                                            </div>
-
-
-                                        </div>
-                                        <div class="col-md-12">
-    <hr>
-    <div class="d-flex justify-content-center mt-2">
-        <h3 class="text-white text-shadow-black">Método de Pago</h3>
-    </div>
-    <div class="row mt-3">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body text-center bg-light">
-                    <i class="fas fa-money-bill-wave fa-3x text-success mb-3"></i>
-                    <h5 class="card-title mb-4 ">Pago en Efectivo</h5>
-                    <p class="card-text mb-5">Paga en efectivo al momento de la entrega.</p>
-                    <div class="form-check">
-                        <input class="form-check-input custom-radio-input " type="radio" name="metodoPago" id="pagoEfectivo" value="efectivo" checked>
-                        <label class="form-check-label" for="pagoEfectivo"></label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body text-center bg-light-secondary">
-                    <i class="fas fa-university fa-3x text-primary mb-3"></i>
-                    <h5 class="card-title mb-4">Transferencia Bancaria</h5>
-                    <p class="card-text mb-5">Realiza una transferencia a nuestra cuenta.</p>
-                    <div class="form-check">
-                        <input class="form-check-input custom-radio-input" type="radio" name="metodoPago" 
-                                id="pagoTransferencia" value="transferencia">
-                        <label class="form-check-label" for="pagoTransferencia">Seleccionar</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="infoTransferencia" style="display: none;" class="col-md-12 mt-3">
-    <hr>
-    <h4 class="text-white text-center">Información para Transferencia Bancaria</h4>
-    <ul class="list-group mt-3">
-        <li class="list-group-item">Banco: Banco BASSO </li>
-        <li class="list-group-item">IBAN: ES00 0001 0002 0003 0004 0005</li>
-        <li class="list-group-item">Beneficiario: Eurogames S.A.</li>
-        <li class="list-group-item">Concepto: Tu número de pedido</li>
-    </ul>
-</div>
-                                </div>
-                                <div class="col-md-6 mx-auto p-4">
-                                    <h3 class="text-white text-shadow-black text-center mb-5">Detalles de tu compra</h3>
-
-                                    <div class="card mt-5">
-                                        <div class="card-body bg-eurogames-blanco">
-                                            <?php foreach ($juegos as $juego) : ?>
-                                                <div class="d-flex justify-content-center">
-                                                    <img src="<?php echo $juego['foto']; ?>" class="img-fluid text-center mt-3" alt="<?php echo $juego['nombre_juego']; ?>" style="max-width: 100px;">
-                                                </div>
-                                                <div class="d-flex justify-content-center ">
-                                                    <h5 class="fw-bolder mt-3 mb-5"><?php echo $juego['nombre_juego']; ?></h5>
-                                                </div>
-                                                <div class="table-responsive">
-                                                    <table class="table table-striped  text-center align-middle">
-                                                        <thead >
-                                                            <tr class="border-5">
-                                                                <th>Cantidad</th>
-                                                                <th>Precio</th>
-                                                                <th>Subtotal</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr class="border-5">
-                                                                <td><?php echo $juego['cantidad']; ?></td>
-                                                                <td>€<?php echo number_format($juego['precio'], 2); ?></td>
-                                                                <td>€<?php echo number_format($juego['precio'] * $juego['cantidad'], 2); ?></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                    <hr class="border-5">
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
 
                                     </div>
-                                    <h3 class="text-white text-shadow-black text-center mt-4">Resumen de la Compra</h3>
-                                    <div class="card mt-3 mr-4 bg-eurogames-blanco">
-                                        <div class="card-body bg-eurogames-blanco">
-                                            <ul class="list-group list-group-flush">
-                                                <li class="list-group-item">Subtotal: <span class="justify-content-end">€<?php echo $resumenCompra['subtotal']; ?></span></li>
-                                                <li class="list-group-item">Gastos de Envío: €<?php echo $resumenCompra['envio']; ?></li>
-                                                <li class="list-group-item">Impuestos (21%): €<?php echo $resumenCompra['impuestos']; ?></li>
-                                                <li class="list-group-item bg-warning text-shadow-dark">Total a Pagar: €<?php echo $resumenCompra['total']; ?></li>
-                                            </ul>
+                                    <div class="col-md-12">
+                                        <hr>
+                                        <div class="d-flex justify-content-center mt-2">
+                                            <h3 class="text-white text-shadow-black">Método de Pago</h3>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-6">
+                                                <div class="card">
+                                                    <div class="card-body text-center bg-light">
+                                                        <i class="fas fa-money-bill-wave fa-3x text-success mb-3"></i>
+                                                        <h5 class="card-title mb-4 ">Pago en Efectivo</h5>
+                                                        <p class="card-text mb-5">Paga en efectivo al momento de la entrega.</p>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input custom-radio-input " type="radio" name="metodoPago" id="pagoEfectivo" value="efectivo" checked>
+                                                            <label class="form-check-label" for="pagoEfectivo"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card">
+                                                    <div class="card-body text-center bg-light-secondary">
+                                                        <i class="fas fa-university fa-3x text-primary mb-3"></i>
+                                                        <h5 class="card-title mb-4">Transferencia Bancaria</h5>
+                                                        <p class="card-text mb-5">Realiza una transferencia a nuestra cuenta.</p>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input custom-radio-input" type="radio" name="metodoPago" id="pagoTransferencia" value="transferencia">
+                                                            <label class="form-check-label" for="pagoTransferencia">Seleccionar</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="d-flex justify-content-center mt-5 mb-3">
-                                    <button type="submit" class="btn btn-orange-black mt-3 mb-3 justify-content-center btn-lg font-weight-bold">CONFIRMAR EL PEDIDO</button>
-                                </div>
-                                </form>
-                            <?php endif; ?>
+
+                                    <div id="infoTransferencia" style="display: none;" class="col-md-12 mt-3">
+                                        <hr>
+                                        <h4 class="text-white text-center">Información para Transferencia Bancaria</h4>
+                                        <ul class="list-group mt-3">
+                                            <li class="list-group-item">Banco: Banco BASSO </li>
+                                            <li class="list-group-item">IBAN: ES00 0001 0002 0003 0004 0005</li>
+                                            <li class="list-group-item">Beneficiario: Eurogames S.A.</li>
+                                            <li class="list-group-item">Concepto: Tu número de pedido</li>
+                                        </ul>
+                                    </div>
                             </div>
+                            <div class="col-md-6 mx-auto p-4">
+                                <h3 class="text-white text-shadow-black text-center mb-5">Detalles de tu compra</h3>
+
+                                <div class="card mt-5">
+                                    <div class="card-body bg-eurogames-blanco">
+                                        <?php foreach ($juegos as $juego) : ?>
+                                            <div class="d-flex justify-content-center">
+                                                <img src="<?php echo $juego['foto']; ?>" class="img-fluid text-center mt-3" alt="<?php echo $juego['nombre_juego']; ?>" style="max-width: 100px;">
+                                            </div>
+                                            <div class="d-flex justify-content-center ">
+                                                <h5 class="fw-bolder mt-3 mb-5"><?php echo $juego['nombre_juego']; ?></h5>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped  text-center align-middle">
+                                                    <thead>
+                                                        <tr class="border-5">
+                                                            <th>Cantidad</th>
+                                                            <th>Precio</th>
+                                                            <th>Subtotal</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="border-5">
+                                                            <td><?php echo $juego['cantidad']; ?></td>
+                                                            <td>€<?php echo number_format($juego['precio'], 2); ?></td>
+                                                            <td>€<?php echo number_format($juego['precio'] * $juego['cantidad'], 2); ?></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <hr class="border-5">
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+
+                                </div>
+                                <h3 class="text-white text-shadow-black text-center mt-4">Resumen de la Compra</h3>
+                                <div class="card mt-3 mr-4 bg-eurogames-blanco">
+                                    <div class="card-body bg-eurogames-blanco">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">Subtotal: <span class="justify-content-end">€<?php echo $resumenCompra['subtotal']; ?></span></li>
+                                            <li class="list-group-item">Gastos de Envío: €<?php echo $resumenCompra['envio']; ?></li>
+                                            <li class="list-group-item">Impuestos (21%): €<?php echo $resumenCompra['impuestos']; ?></li>
+                                            <li class="list-group-item bg-warning text-shadow-dark">Total a Pagar: €<?php echo $resumenCompra['total']; ?></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center mt-5 mb-3">
+                                <button type="submit" class="btn btn-orange-black mt-3 mb-3 justify-content-center btn-lg font-weight-bold">CONFIRMAR EL PEDIDO</button>
+                            </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

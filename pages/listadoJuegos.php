@@ -1,20 +1,19 @@
 <?php
 session_start();
-
 require_once "functions.php";
 require_once '../classes/Juego.php';
 
 $juego = new Juego();
 $juegos = $juego->listarJuegos();
-$listarJuegos = $juego->listarJuegos();
+$juegosSinFiltrar = $juego->listarJuegos();
 
 $editores = $juego->obtenerEditores();
 $categorias = $juego->obtenerCategorias();
-$busqueda = isset($_GET['busqueda']) ? limpiarDatos($_GET['busqueda']) : '';
-$orden = isset($_GET['orden']) ? limpiarDatos($_GET['orden']) : '';
+
 $editorSeleccionado = isset($_GET['editor']) ? limpiarDatos($_GET['editor']) : null;
 $categoriaSeleccionada = isset($_GET['categoria']) ? limpiarDatos($_GET['categoria']) : null;
 $ordenSeleccionado = isset($_GET['orden']) ? limpiarDatos($_GET['orden']) : null;
+
 $precioFiltrado = isset($_GET['precio']) ? limpiarDatos($_GET['precio']) : null;
 $duracionFiltrada = isset($_GET['duracion']) ? limpiarDatos($_GET['duracion']) : null;
 $edadFiltrada = isset($_GET['edad']) ? limpiarDatos($_GET['edad']) : null;
@@ -39,11 +38,57 @@ if (isset($_POST['agregar_al_carrito'])) {
     echo $_POST['id_juego'];
     $idJuego = $_POST['id_juego'];
     $_SESSION['carrito'][] = $idJuego;
+    $_SESSION['pedido_agregado']['estado'] = "por pedir";
     header("Location: listadoJuegos.php");
     exit;
 }
 
+if (!empty($pedidoRealizado) && !empty($datosUsuario)) {
+    $nombreUsuario = isset($datosUsuario['nombre_usuario']) ? limpiarDatos($datosUsuario['nombre_usuario']) : "";
+    $apellidosUsuario = isset($datosUsuario['apellidos_usuario']) ? limpiarDatos($datosUsuario['apellidos_usuario']) : "";
+    $emailUsuario = isset($datosUsuario['email']) ? limpiarDatos($datosUsuario['email']) : "";
+    $telefonoUsuario = isset($datosUsuario['telefono']) ? limpiarDatos($datosUsuario['telefono']) : "";
+    $domicilioUsuario = isset($pedidoRealizado[0]['direccion_facturacion']) ? limpiarDatos($pedidoRealizado[0]['direccion_facturacion']) : "";
+    $cifNif = isset($pedidoRealizado[0]['cif_nif']) ? limpiarDatos($pedidoRealizado[0]['cif_nif']) : "";
+    $localidadUsuario = isset($pedidoRealizado[0]['localidad']) ? limpiarDatos($pedidoRealizado[0]['localidad']) : "";
+    $provinciaUsuario = isset($pedidoRealizado[0]['provincia']) ? limpiarDatos($pedidoRealizado[0]['provincia']) : "";
+    $codigoPostalUsuario = isset($pedidoRealizado[0]['codigo_postal']) ? limpiarDatos($pedidoRealizado[0]['codigo_postal']) : "";
+    $nombreDestinatario = isset($pedidoRealizado[0]['nombre_destinatario']) ? limpiarDatos($pedidoRealizado[0]['nombre_destinatario']) : "";
+    $telefonoDestinatario = isset($pedidoRealizado[0]['telefono_destinatario']) ? limpiarDatos($pedidoRealizado[0]['telefono_destinatario']) : "";
+    $domicilioDestinatario = isset($pedidoRealizado[0]['domicilio_destinatario']) ? limpiarDatos($pedidoRealizado[0]['domicilio_destinatario']) : "";
+    $apellidosDestinatario = isset($pedidoRealizado[0]['apellidos_destinatario']) ? limpiarDatos($pedidoRealizado[0]['apellidos_destinatario']) : "";
+    $localidadDestinatario = isset($pedidoRealizado[0]['localidad_destinatario']) ? limpiarDatos($pedidoRealizado[0]['localidad_destinatario']) : "";
+    $provinciaDestinatario = isset($pedidoRealizado[0]['provincia_destinatario']) ? limpiarDatos($pedidoRealizado[0]['provincia_destinatario']) : "";
+    $codigoPostalDestinatario = isset($pedidoRealizado['codigo_postal_destinatario']) ? limpiarDatos($pedidoRealizado[0]['codigo_postal_destinatario']) : "";
+    $metodoPago = isset($pedidoRealizado[0]['metodo_pago']) ? limpiarDatos($pedidoRealizado[0]['metodo_pago']) : "";
+    $metodoEnvio = isset($pedidoRealizado[0]['metodo_envio']) ? limpiarDatos($pedidoRealizado[0]['metodo_envio']) : "";
+    $fechaPedido = isset($pedidoRealizado[0]['fecha_pedido']) ? limpiarDatos($pedidoRealizado[0]['fecha_pedido']) : "";
+    $nroSeguimiento = isset($pedidoRealizado[0]['nro_seguimiento']) ? limpiarDatos($pedidoRealizado[0]['nro_seguimiento']) : "";
+    $detallesJuegos = [];
+
+    foreach ($pedidoRealizado as $detalle) {
+        $idJuego = $detalle['id_juego'];
+        $cantidad = $detalle['cantidad'];
+        $obtenerJuego = $juego->obtenerJuegoPorId($idJuego);
+
+        if (!empty($obtenerJuego)) {
+            if (!isset($detallesJuegos[$idJuego])) {
+                $detallesJuegos[$idJuego] = [
+                    'id_juego' => $idJuego,
+                    'nombre' => $obtenerJuego['nombre_juego'],
+                    'precio' => $obtenerJuego['precio'],
+                    'cantidad' => 0
+                ];
+            }
+            $detallesJuegos[$idJuego]['cantidad'] += $cantidad;
+        }
+    }
+    $juegos = array_values($detallesJuegos);
+} else {
+    $errores['general'] = "Error: No se encontraron datos suficientes para generar la factura.";
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -63,39 +108,39 @@ if (isset($_POST['agregar_al_carrito'])) {
     <div class="container mt-5">
         <div class="row mt-5">
             <h2 class="text-black mb-5 text-shadow-blue text-center mt-5">¡Bienvenid@ a nuestra ludotecta!</h2>
-            
+
             <div class="col-md-12 segundo">
                 <form method="GET" class=" p-1">
-                    <div class="input-group d-flex justify-content-end">
-                        <label for="orden" class="text-black text-shadow-bold ">ORDENAR POR:</label>
+                    <div class="input-group d-flex justify-content-end fs-5 roboto-mono">
+                        <label for="orden" class="text-black fs-5 fw-bolder">ORDENAR POR:</label>
                         <select class="custom-select" id="orden" name="orden" onchange="this.form.submit()">
-                            <option value="precio_asc" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "precio_asc") ? 'selected' : ''; ?>>Precio: Menor a Mayor</option>
-                            <option value="precio_desc" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "precio_desc") ? 'selected' : ''; ?>>Precio: Mayor a Menor</option>
-                            <option value="nombre_asc" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "nombre_asc") ? 'selected' : ''; ?>>Nombre: A a Z</option>
-                            <option value="nombre_desc" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "nombre_desc") ? 'selected' : ''; ?>>Nombre: Z a A</option>
+                            <option class="fs-5"value="precio_asc" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "precio_asc") ? 'selected' : ''; ?>>Precio: Menor a Mayor</option>
+                            <option class="fs-5"value="precio_desc" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "precio_desc") ? 'selected' : ''; ?>>Precio: Mayor a Menor</option>
+                            <option class="fs-5"value="nombre_asc" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "nombre_asc") ? 'selected' : ''; ?>>Nombre: A a Z</option>
+                            <option class="fs-5"value="nombre_desc" <?php echo (isset($_GET['orden']) && $_GET['orden'] === "nombre_desc") ? 'selected' : ''; ?>>Nombre: Z a A</option>
                         </select>
                         <input type="hidden" name="busqueda" value="<?php echo htmlspecialchars($_GET['busqueda'] ?? ''); ?>">
                     </div>
                 </form>
             </div>
-            
+
             <div class="col-md-3 primero mb-5  ">
                 <div class="container-fluid register-left mt-5 ">
                     <p class="text-white roboto-mono fs-2 text-start ">Filtrar por:</p>
-                    <form method="GET" class=" p-5">
-                        <div class="input-group roboto-mono">
-                            <label for="editor" class="px-1  fw-bolder">Editor:</label>
-                            <select class="custom-select" id="editor" name="editor" onchange="this.form.submit()">
+                    <form method="GET" class="mb-5 p-4 roboto-mono fs-5">
+                        <div class="input-group">
+                            <label class="p-1"for="editor">Editor:</label>
+                            <select class="custom-select w-100" id="editor" name="editor" onchange="this.form.submit()">
                                 <option value="Todos" <?php echo (!isset($_GET['editor']) || (isset($_GET['editor']) && $_GET['editor'] === "Todos")) ? 'selected' : ''; ?>>Todos</option>
                                 <?php foreach ($editores as $editor) : ?>
-                                    <option value="<?php echo $editor; ?>" <?php echo (isset($_GET['editor']) && $_GET['editor'] === $editor) ? 'selected' : ''; ?>><?php echo $editor; ?></option>
+                                    <option class="fs-5" value="<?php echo $editor; ?>" <?php echo (isset($_GET['editor']) && $_GET['editor'] === $editor) ? 'selected' : ''; ?>><?php echo $editor; ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="input-group mt-3">
-                            <label for="categoria" class="px-1  fw-bolder">Categoria:</label>
-                            <select class="custom-select" id="categoria" name="categoria" onchange="this.form.submit()">
-                                <option value="Todos" <?php echo (!isset($_GET['categoria']) || (isset($_GET['categoria']) && $_GET['categoria'] === "Todos")) ? 'selected' : ''; ?>>Todos</option>
+                            <label for="categoria">Categoría:</label>                            
+                            <select class="custom-select w-100" id="categoria" name="categoria" onchange="this.form.submit()">
+                                <option class="fs-5" value="Todos" <?php echo (!isset($_GET['categoria']) || (isset($_GET['categoria']) && $_GET['categoria'] === "Todos")) ? 'selected' : ''; ?>>Todos</option>
                                 <?php
                                 $categoriasFiltradas = ['dados', 'tablero', 'carta', 'oferta', 'novedad'];
                                 foreach ($categoriasFiltradas as $categoria) : ?>
@@ -103,37 +148,31 @@ if (isset($_POST['agregar_al_carrito'])) {
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="input-group mt-3">
-                            <label for="precio" class="px-1  fw-bolder">Precio:</label>
-                            <select class="custom-select" id="precio" name="precio">
-                                <option value="">Todos</option>
-                                <?php
-                                $preciosFiltrados = ['0-20', '20-50', '50+'];
-                                foreach ($preciosFiltrados as $precio) : ?>
-                                    <option value="<?php echo $precio; ?>" <?php echo (isset($_GET['precio']) && $_GET['precio'] === $precio) ? 'selected' : ''; ?>><?php echo $precio; ?></option>
-                                <?php endforeach; ?>
+                        <div class="input-group mt-3 roboto-mono">
+                            <label class="p-1 fs-5"for="precio">Precio:</label>
+                            <select class="custom-select w-100" id="precio" name="precio" onchange="this.form.submit()">
+                                <option class="fs-5"value="Todos" <?php echo (!isset($_GET['precio']) || (isset($_GET['precio']) && $_GET['precio'] === "Todos")) ? 'selected' : ''; ?>>Todos</option>
+                                <option class="fs-5"value="20" <?php echo (isset($_GET['precio']) && $_GET['precio'] === "20") ? 'selected' : ''; ?>>Desde 5$ a 20$</option>
+                                <option class="fs-5"value="50" <?php echo (isset($_GET['precio']) && $_GET['precio'] === "50") ? 'selected' : ''; ?>>Desde 20$ a 50$</option>
+                                <option class="fs-5"value="51" <?php echo (isset($_GET['precio']) && $_GET['precio'] === "51") ? 'selected' : ''; ?>>Más de 50$</option>
                             </select>
                         </div>
                         <div class="input-group mt-3">
-                            <label for="duracion" class="px-1  fw-bolder">Duración:</label>
-                            <select class="custom-select" id="duracion" name="duracion">
-                                <option value="">Todas</option>
-                                <?php
-                                $duracionesFiltradas = ['0-30', '30-60', '60+'];
-                                foreach ($duracionesFiltradas as $duracion) : ?>
-                                    <option value="<?php echo $duracion; ?>" <?php echo (isset($_GET['duracion']) && $_GET['duracion'] === $duracion) ? 'selected' : ''; ?>><?php echo $duracion; ?></option>
-                                <?php endforeach; ?>
+                            <label class="p-1" for="duracion">Duración:</label>
+                            <select class="custom-select w-100 fs-5" id="duracion" name="duracion" onchange="this.form.submit()">
+                                <option class="fs-5"value="Todos" <?php echo (!isset($_GET['duracion']) || (isset($_GET['duracion']) && $_GET['duracion'] === "Todos")) ? 'selected' : ''; ?>>Todos</option>
+                                <option class="fs-5"value="30" <?php echo (isset($_GET['duracion']) && $_GET['duracion'] === "30") ? 'selected' : ''; ?>>Hasta 30 min</option>
+                                <option class="fs-5"value="60" <?php echo (isset($_GET['duracion']) && $_GET['duracion'] === "60") ? 'selected' : ''; ?>>Más de 30 hasta 60 min</option>
+                                <option class="fs-5"value="61" <?php echo (isset($_GET['duracion']) && $_GET['duracion'] === "61") ? 'selected' : ''; ?>>Más de 60 min</option>
                             </select>
                         </div>
                         <div class="input-group mt-3">
-                            <label for="edad_minima" class="px-1  fw-bolder">Edad:</label>
-                            <select class="custom-select px-3" id="edad_minima" name="edad_minima">
-                                <option value="">Todas</option>
-                                <?php
-                                $edadesMinimasFiltradas = ['0-7', '8-12', '12+'];
-                                foreach ($edadesMinimasFiltradas as $edad) : ?>
-                                    <option value="" <?php echo (isset($_GET['edad_minima']) && $_GET['edad_minima'] === $edad) ? 'selected' : ''; ?>><?php echo $edad; ?></option>
-                                <?php endforeach; ?>
+                            <label class="p-1" for="edad_minima">Edad mínima:</label>
+                            <select class="custom-select w-100" id="edad_minima" name="edad_minima" onchange="this.form.submit()">
+                                <option value="Todos" <?php echo (!isset($_GET['edad_minima']) || (isset($_GET['edad_minima']) && $_GET['edad_minima'] === "Todos")) ? 'selected' : ''; ?>>Todos</option>
+                                <option value="6" <?php echo (isset($_GET['edad_minima']) && $_GET['edad_minima'] === "6") ? 'selected' : ''; ?>>A partir de 6 años</option>
+                                <option value="12" <?php echo (isset($_GET['edad_minima']) && $_GET['edad_minima'] === "12") ? 'selected' : ''; ?>>Entre 6 a 12 años</option>
+                                <option value="13" <?php echo (isset($_GET['edad_minima']) && $_GET['edad_minima'] === "13") ? 'selected' : ''; ?>>Más de 12 años</option>
                             </select>
                         </div>
                     </form>
@@ -141,7 +180,7 @@ if (isset($_POST['agregar_al_carrito'])) {
             </div>
             <div class="col-md-9 mt-3 tercero">
                 <div class="row d-flex justify-content-center ">
-                    <?php foreach ($listarJuegos as $key => $juego) : ?>
+                    <?php while ($juego = is_object($juegos) ? $juegos->fetch(PDO::FETCH_ASSOC) : null) : ?>
                         <div class="col-md-5 col-sm-5 mb-5 text-black register-grey-buscar">
                             <table class="table ">
                                 <tbody>
@@ -196,19 +235,25 @@ if (isset($_POST['agregar_al_carrito'])) {
                                         <hr>
                                         <p class="text-black-50 mt-5 border-top border-bottom mb-2"><strong class="text-black">Descripción:</strong> <?php echo $juego['descripcion']; ?></p>
                                         <p class="text-black-50  border-bottom mt-2 mb-2"><strong class="text-black">Editor:</strong> <?php echo $juego['editor']; ?></p>
-                                        <p class="text-black-50  border-bottom mt-2 mb-2"><strong class="text-black">Año de Edición:</strong> <?php echo $juego['anio_edicion']; ?></p>
+                                        <p class="text-black-50 border-bottom mt-2 mb-2"><strong class="text-black">Año de Edición:</strong> <?php echo $juego['anio_edicion']; ?></p>
                                         <p class="text-black-50  border-bottom mt-2 mb-2"><strong class="text-black">Jugadores:</strong> <?php echo $juego['cantidad_jugadores']; ?></p>
                                         <p class="text-black-50  border-bottom-3 mb mt-2-2"><strong class="text-black">Duración:</strong> <?php echo $juego['duracion_minutos']; ?> minutos</p>
                                         <p class="text-black-50  mt-2 mb-2"><strong class="text-black">Edad Mínima:</strong> <?php echo $juego['edad_minima']; ?> años</p>
-                                        <?php
-                                        foreach ($categorias as $key => $categoria) {
-                                            if ($categoria['id_categoria'] == $juego['id_categoria']) {
-                                                $nombreCategoria = $categoria['nombre_categoria'];
-                                            }
-                                        }
-                                        ?>
-                                        <p class="text-black  mt-2 mb-2"><strong>Categoria: </strong><?php echo $nombreCategoria; ?> </p>
-
+                                        <?php if (!empty($juego['nombre_categoria'])) {
+                                                    $nombreCategoria = $juego['nombre_categoria'];
+                                                    ?><p class="text-black  mt-2 mb-2"><strong>Categoria: </strong><?php echo $nombreCategoria; ?> </p>
+                                                            <?php 
+                                                } else {
+                                                    $nombreCategoria = "";
+                                                    foreach ($categorias as $key => $categoria) {
+                                                        if ($categoria['id_categoria'] == $juego['id_categoria']) {
+                                                            $nombreCategoria = $categoria['nombre_categoria'];
+                                                            ?><p class="text-black  mt-2 mb-2"><strong>Categoria: </strong><?php echo $nombreCategoria; ?> </p>
+                                                            <?php break;
+                                                        }
+                                                    }
+                                                }?>
+                                        
                                     </div>
                                     <div class="modal-footer">
                                         <form method="post">
@@ -224,12 +269,11 @@ if (isset($_POST['agregar_al_carrito'])) {
                                 </div>
                             </div>
                         </div>
-                    <?php endforeach; ?>
+                    <?php endwhile; ?>
                 </div>
             </div>
         </div>
     </div>
-    <!-- </div> -->
     <?php require 'footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
