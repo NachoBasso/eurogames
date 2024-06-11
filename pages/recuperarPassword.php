@@ -43,7 +43,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . $secret_key . '&response=' . $recaptcha;
         $response = file_get_contents($url);
         $response = json_decode($response);
-   }
+
+        if (!$response->success) {
+            $errores['recaptcha'] = 'Error en el reCAPTCHA.';
+        }
+    }
 
 
     if (empty($errores)) {
